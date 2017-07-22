@@ -2,7 +2,7 @@
 Compress and resize Fallout 4 textures
 
 # Download
-
+- [Admirativ/Fallout4-Texture-Compressor/releases](https://github.com/Admirativ/Fallout4-Texture-Compressor/releases)
 
 # Dependencies
 Program uses [Microsoft DirectXTex Texconv, Texdiag](https://github.com/Microsoft/DirectXTex/releases) 
