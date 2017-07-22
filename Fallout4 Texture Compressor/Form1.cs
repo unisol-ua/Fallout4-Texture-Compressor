@@ -48,8 +48,8 @@ namespace Fallout4_Texture_Compressor
                     form.Text = "Copying files: " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
                     FileInfo fileinf = new FileInfo(file);
                     string newfolders = fileinf.DirectoryName.Replace(textBox1.Text, "");
-                    Directory.CreateDirectory(Application.StartupPath + "\\Backup" + newfolders);
-                    File.Copy(file, Application.StartupPath + "\\Backup" + fileinf.FullName.Replace(textBox1.Text, ""), true);
+                    Directory.CreateDirectory(Application.StartupPath + "\\backup" + newfolders);
+                    File.Copy(file, Application.StartupPath + "\\backup" + fileinf.FullName.Replace(textBox1.Text, ""), true);
                 }
                 form.Text = "Archiving files";
                 string time = DateTime.Now.Second + "s_" + DateTime.Now.Minute + "m_" + DateTime.Now.Hour + "h_" + DateTime.Now.Day + "d_" + DateTime.Now.Month + "m_" + DateTime.Now.Year + "y";
@@ -60,11 +60,12 @@ namespace Fallout4_Texture_Compressor
                 startInfo.RedirectStandardOutput = true;
                 startInfo.RedirectStandardError = true;
                 startInfo.FileName = Application.StartupPath + "\\bin\\7za.exe";
-                startInfo.Arguments = "a backup_" + time + ".zip \"" + Application.StartupPath + "\\Backup\\*\" -mx6 -o" + Application.StartupPath + "\\";
+                if(textBox2.Text == "") { startInfo.Arguments = "a backup_" + time + ".zip \"" + Application.StartupPath + "\\backup\\*\" -mx6 -o" + Application.StartupPath + "\\"; }
+                else { startInfo.Arguments = "a " + textBox2.Text + "_" + time + ".zip \"" + Application.StartupPath + "\\backup\\*\" -mx6 -o" + Application.StartupPath + "\\"; }
                 process.StartInfo = startInfo;
                 process.Start();
                 process.WaitForExit();
-                Directory.Delete(Application.StartupPath + "\\Backup", true);
+                Directory.Delete(Application.StartupPath + "\\backup", true);
             }
             i = 0;
             foreach (string file in allfiles)
@@ -105,33 +106,49 @@ namespace Fallout4_Texture_Compressor
                     bool needtogenmm = false;
                     if (size > ifgreater)
                     {
-                        if (ddsinfo.format.Contains("SRGB"))
+                        if (!ddsinfo.format.Contains("BC1"))
                         {
-                            startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1";
-                            listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
-                            listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
-                            listBox1.Items.Add("new format = BC1_UNORM_SRGB");
+                            if (ddsinfo.format.Contains("SRGB"))
+                            {
+                                startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1";
+                                listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
+                                listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
+                                listBox1.Items.Add("new format = BC1_UNORM_SRGB");
+                            }
+                            else
+                            {
+                                startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1";
+                                listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
+                                listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
+                                listBox1.Items.Add("new format = BC1_UNORM");
+                            }
                         }
                         else
                         {
-                            startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1";
+                            startInfo.Arguments = "\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1";
                             listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
                             listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
-                            listBox1.Items.Add("new format = BC1_UNORM");
                         }
                         needtogenmm = true;
                     }
                     else
                     {
-                        if (ddsinfo.format.Contains("SRGB"))
+                        if (!ddsinfo.format.Contains("BC1"))
                         {
-                            startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"";
-                            listBox1.Items.Add("new format = BC1_UNORM_SRGB");
+                            if (ddsinfo.format.Contains("SRGB"))
+                            {
+                                startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"";
+                                listBox1.Items.Add("new format = BC1_UNORM_SRGB");
+                            }
+                            else
+                            {
+                                startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM -o \"" + fileinf.DirectoryName + "\"";
+                                listBox1.Items.Add("new format = BC1_UNORM");
+                            }
                         }
                         else
                         {
-                            startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM -o \"" + fileinf.DirectoryName + "\"";
-                            listBox1.Items.Add("new format = BC1_UNORM");
+                            listBox1.Items.Add("Already compressed");
                         }
                     }
                     process.StartInfo = startInfo;
@@ -155,15 +172,22 @@ namespace Fallout4_Texture_Compressor
                     startInfo.CreateNoWindow = true;
                     startInfo.UseShellExecute = false;
                     startInfo.FileName = Application.StartupPath + "\\bin\\texconv.exe";
-                    if (ddsinfo.format.Contains("SRGB"))
+                    if (!ddsinfo.format.Contains("BC1"))
                     {
-                        startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"";
-                        listBox1.Items.Add("new format = BC1_UNORM_SRGB");
+                        if (ddsinfo.format.Contains("SRGB"))
+                        {
+                            startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"";
+                            listBox1.Items.Add("new format = BC1_UNORM_SRGB");
+                        }
+                        else
+                        {
+                            startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM -o \"" + fileinf.DirectoryName + "\"";
+                            listBox1.Items.Add("new format = BC1_UNORM");
+                        }
                     }
                     else
                     {
-                        startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM -o \"" + fileinf.DirectoryName + "\"";
-                        listBox1.Items.Add("new format = BC1_UNORM");
+                        listBox1.Items.Add("Already compressed");
                     }
                     process.StartInfo = startInfo;
                     process.Start();
@@ -208,7 +232,10 @@ namespace Fallout4_Texture_Compressor
                 }
                 filesize = Math.Round((Double)new FileInfo(file).Length / 1024, 1);
                 newfilessize += filesize;
-                listBox1.Items.Add("new file size = " + filesize + " kb");
+                if (!listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Already compressed"))
+                {
+                    listBox1.Items.Add("new file size = " + filesize + " kb");
+                }
             }
             form.Text = "Compressed from " + Math.Round(filessize / 1024, 3) + "mb to " + Math.Round(newfilessize / 1024, 3) + "mb Saved = " + Math.Round((filessize - newfilessize)/1024, 3) + "mb";
         }
