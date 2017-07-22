@@ -62,7 +62,7 @@ namespace Fallout4_Texture_Compressor
                 startInfo.RedirectStandardError = true;
                 startInfo.FileName = Application.StartupPath + "\\bin\\7za.exe";
                 if(textBox2.Text == "") { startInfo.Arguments = "a backup_" + time + ".zip \"" + Application.StartupPath + "\\backup\\*\" -mx6 -o" + Application.StartupPath + "\\"; }
-                else { startInfo.Arguments = "a " + textBox2.Text + "_" + time + ".zip \"" + Application.StartupPath + "\\backup\\*\" -mx6 -o" + Application.StartupPath + "\\"; }
+                else { startInfo.Arguments = "a \"" + textBox2.Text + "_" + time + ".zip\" \"" + Application.StartupPath + "\\backup\\*\" -mx6 -o" + Application.StartupPath + "\\"; }
                 process.StartInfo = startInfo;
                 process.Start();
                 process.WaitForExit();
