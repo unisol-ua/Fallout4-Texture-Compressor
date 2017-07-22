@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
@@ -291,6 +292,23 @@ namespace Fallout4_Texture_Compressor
                 xdoc.Add(settings);
                 xdoc.Save("settings.xml");
             }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            StreamWriter stream = new StreamWriter("log.txt", true, Encoding.UTF8);
+            foreach (string line in listBox1.Items)
+            {
+                stream.WriteLine(line);
+            }
+            stream.Close();
+            MessageBox.Show("log.txt created in program directory");
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            About form = new About();
+            form.Show();
         }
     }
 
