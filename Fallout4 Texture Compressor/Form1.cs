@@ -100,6 +100,12 @@ namespace Fallout4_Texture_Compressor
                     else if (comboBox1.Text.Contains("16")) { ifgreater = 16; }
                     else if (comboBox1.Text.Contains("32")) { ifgreater = 32; }
                     else if (comboBox1.Text.Contains("64")) { ifgreater = 64; }
+                    else
+                    {
+                        MessageBox.Show("Avoid editing resize combobox. Use only numbers for custom paramter (without if<> and any words). Resize parameter has been set to custom number.");
+                        try{ ifgreater = int.Parse(comboBox1.Text); }
+                        catch { MessageBox.Show("Failed parse custom parameter. Parameter has been reset to 8192"); ifgreater = 8192; }
+                    }
                     bool needtogenmm = false;
                     if (size > ifgreater)
                     {
@@ -257,6 +263,12 @@ namespace Fallout4_Texture_Compressor
                     else if (comboBox1.Text.Contains("16")) { ifgreater = 16; }
                     else if (comboBox1.Text.Contains("32")) { ifgreater = 32; }
                     else if (comboBox1.Text.Contains("64")) { ifgreater = 64; }
+                    else
+                    {
+                        MessageBox.Show("Avoid editing resize combobox. Use only numbers for custom paramter (without if<> and any words). Resize parameter has been set to custom number.");
+                        try { ifgreater = int.Parse(comboBox1.Text); }
+                        catch { MessageBox.Show("Failed parse custom parameter. Parameter has been reset to 8192"); ifgreater = 8192; }
+                    }
                     if (size > ifgreater)
                     {
                         texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
@@ -268,7 +280,7 @@ namespace Fallout4_Texture_Compressor
                 }
                 filesize = Math.Round((Double)new FileInfo(file).Length / 1024, 1);
                 newfilessize += filesize;
-                if (!listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Already compressed"))
+                if (!listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Already compressed") || !listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Other format compress is unchecked, skipping"))
                 {
                     listBox1.Items.Add("new file size = " + filesize + " kb");
                 }
