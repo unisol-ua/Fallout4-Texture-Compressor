@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -99,34 +100,53 @@ namespace Fallout4_Texture_Compressor
                     else if (comboBox1.Text.Contains("16")) { ifgreater = 16; }
                     else if (comboBox1.Text.Contains("32")) { ifgreater = 32; }
                     else if (comboBox1.Text.Contains("64")) { ifgreater = 64; }
-                    Process process = new Process();
-                    ProcessStartInfo startInfo = new ProcessStartInfo();
-                    startInfo.CreateNoWindow = true;
-                    startInfo.UseShellExecute = false;
-                    startInfo.FileName = Application.StartupPath + "\\bin\\texconv.exe";
                     bool needtogenmm = false;
                     if (size > ifgreater)
                     {
-                        if (!ddsinfo.format.Contains("BC1"))
+                        if (!ddsinfo.format.Contains("BC1"))//skip if already bc1 (only resize)
                         {
-                            if (ddsinfo.format.Contains("SRGB"))
+                            if (ddsinfo.format.Contains("BC"))//check if bc format and compress to bc1
                             {
-                                startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1";
-                                listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
-                                listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
-                                listBox1.Items.Add("new format = BC1_UNORM_SRGB");
+                                if (ddsinfo.format.Contains("SRGB"))
+                                {
+                                    texconv("\"" + file + "\" -y -f BC1_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
+                                    listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
+                                    listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
+                                    listBox1.Items.Add("new format = BC1_UNORM_SRGB");
+                                }
+                                else
+                                {
+                                    texconv("\"" + file + "\" -y -f BC1_UNORM -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
+                                    listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
+                                    listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
+                                    listBox1.Items.Add("new format = BC1_UNORM");
+                                }
+                            }
+                            else if (checkBox4.Checked == true)//if other format and compress checked, compress to bc7
+                            {
+                                if (ddsinfo.format.Contains("SRGB"))
+                                {
+                                    texconv("\"" + file + "\" -y -f BC7_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
+                                    listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
+                                    listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
+                                    listBox1.Items.Add("new format = BC7_UNORM_SRGB");
+                                }
+                                else
+                                {
+                                    texconv("\"" + file + "\" -y -f BC7_UNORM -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
+                                    listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
+                                    listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
+                                    listBox1.Items.Add("new format = BC7_UNORM");
+                                }
                             }
                             else
                             {
-                                startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1";
-                                listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
-                                listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
-                                listBox1.Items.Add("new format = BC1_UNORM");
+                                listBox1.Items.Add("Other format compress is unchecked, skipping");
                             }
                         }
                         else
                         {
-                            startInfo.Arguments = "\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1";
+                            texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
                             listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
                             listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
                         }
@@ -134,17 +154,37 @@ namespace Fallout4_Texture_Compressor
                     }
                     else
                     {
-                        if (!ddsinfo.format.Contains("BC1"))
+                        if (!ddsinfo.format.Contains("BC1"))//skip if already bc1
                         {
-                            if (ddsinfo.format.Contains("SRGB"))
+                            if (ddsinfo.format.Contains("BC"))//check if bc format and compress to bc1
                             {
-                                startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"";
-                                listBox1.Items.Add("new format = BC1_UNORM_SRGB");
+                                if (ddsinfo.format.Contains("SRGB"))
+                                {
+                                    texconv("\"" + file + "\" -y -f BC1_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
+                                    listBox1.Items.Add("new format = BC1_UNORM_SRGB");
+                                }
+                                else
+                                {
+                                    texconv("\"" + file + "\" -y -f BC1_UNORM -o \"" + fileinf.DirectoryName + "\"");
+                                    listBox1.Items.Add("new format = BC1_UNORM");
+                                }
+                            }
+                            else if (checkBox4.Checked == true)//if other format and compress checked, compress to bc7
+                            {
+                                if (ddsinfo.format.Contains("SRGB"))
+                                {
+                                    texconv("\"" + file + "\" -y -f BC7_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
+                                    listBox1.Items.Add("new format = BC7_UNORM_SRGB");
+                                }
+                                else
+                                {
+                                    texconv("\"" + file + "\" -y -f BC7_UNORM -o \"" + fileinf.DirectoryName + "\"");
+                                    listBox1.Items.Add("new format = BC7_UNORM");
+                                }
                             }
                             else
                             {
-                                startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM -o \"" + fileinf.DirectoryName + "\"";
-                                listBox1.Items.Add("new format = BC1_UNORM");
+                                listBox1.Items.Add("Other format compress is unchecked, skipping");
                             }
                         }
                         else
@@ -152,47 +192,53 @@ namespace Fallout4_Texture_Compressor
                             listBox1.Items.Add("Already compressed");
                         }
                     }
-                    process.StartInfo = startInfo;
-                    process.Start();
-                    process.WaitForExit();
                     if (needtogenmm)
                     {
                         //gen mipmaps
-                        startInfo.Arguments = "\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 0";
-                        process.StartInfo = startInfo;
-                        process.Start();
-                        process.WaitForExit();
+                        texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 0");
                     }
                 }
                 else if (checkBox1.Checked == true) //compress
                 {
                     i++;
                     form.Text = "Compressing files : " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
-                    Process process = new Process();
-                    ProcessStartInfo startInfo = new ProcessStartInfo();
-                    startInfo.CreateNoWindow = true;
-                    startInfo.UseShellExecute = false;
-                    startInfo.FileName = Application.StartupPath + "\\bin\\texconv.exe";
-                    if (!ddsinfo.format.Contains("BC1"))
+                    if (!ddsinfo.format.Contains("BC1"))//skip if already bc1
                     {
-                        if (ddsinfo.format.Contains("SRGB"))
+                        if (ddsinfo.format.Contains("BC"))//check if bc format and compress to bc1
                         {
-                            startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"";
-                            listBox1.Items.Add("new format = BC1_UNORM_SRGB");
+                            if (ddsinfo.format.Contains("SRGB"))
+                            {
+                                texconv("\"" + file + "\" -y -f BC1_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
+                                listBox1.Items.Add("new format = BC1_UNORM_SRGB");
+                            }
+                            else
+                            {
+                                texconv("\"" + file + "\" -y -f BC1_UNORM -o \"" + fileinf.DirectoryName + "\"");
+                                listBox1.Items.Add("new format = BC1_UNORM");
+                            }
+                        }
+                        else if (checkBox4.Checked == true)//if other format and compress checked, compress to bc7
+                        {
+                            if (ddsinfo.format.Contains("SRGB"))
+                            {
+                                texconv("\"" + file + "\" -y -f BC7_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
+                                listBox1.Items.Add("new format = BC7_UNORM_SRGB");
+                            }
+                            else
+                            {
+                                texconv("\"" + file + "\" -y -f BC7_UNORM -o \"" + fileinf.DirectoryName + "\"");
+                                listBox1.Items.Add("new format = BC7_UNORM");
+                            }
                         }
                         else
                         {
-                            startInfo.Arguments = "\"" + file + "\" -y -f BC1_UNORM -o \"" + fileinf.DirectoryName + "\"";
-                            listBox1.Items.Add("new format = BC1_UNORM");
+                            listBox1.Items.Add("Other format compress is unchecked, skipping");
                         }
                     }
                     else
                     {
                         listBox1.Items.Add("Already compressed");
                     }
-                    process.StartInfo = startInfo;
-                    process.Start();
-                    process.WaitForExit();
                 }
                 else if (checkBox2.Checked == true) //resize
                 {
@@ -213,20 +259,9 @@ namespace Fallout4_Texture_Compressor
                     else if (comboBox1.Text.Contains("64")) { ifgreater = 64; }
                     if (size > ifgreater)
                     {
-                        Process process = new Process();
-                        ProcessStartInfo startInfo = new ProcessStartInfo();
-                        startInfo.CreateNoWindow = true;
-                        startInfo.UseShellExecute = false;
-                        startInfo.FileName = Application.StartupPath + "\\bin\\texconv.exe";
-                        startInfo.Arguments = "\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1";
-                        process.StartInfo = startInfo;
-                        process.Start();
-                        process.WaitForExit();
+                        texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
                         //gen mipmaps
-                        startInfo.Arguments = "\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 0";
-                        process.StartInfo = startInfo;
-                        process.Start();
-                        process.WaitForExit();
+                        texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 0");
                         listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
                         listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
                     }
@@ -239,6 +274,19 @@ namespace Fallout4_Texture_Compressor
                 }
             }
             form.Text = "Compressed from " + Math.Round(filessize / 1024, 3) + "mb to " + Math.Round(newfilessize / 1024, 3) + "mb Saved = " + Math.Round((filessize - newfilessize)/1024, 3) + "mb";
+        }
+
+        private void texconv(string arguments)
+        {
+            Process process = new Process();
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.CreateNoWindow = true;
+            startInfo.UseShellExecute = false;
+            startInfo.FileName = Application.StartupPath + "\\bin\\texconv.exe";
+            startInfo.Arguments = arguments;//args
+            process.StartInfo = startInfo;
+            process.Start();
+            process.WaitForExit();
         }
 
         private fileinfo checkdds(string file)
