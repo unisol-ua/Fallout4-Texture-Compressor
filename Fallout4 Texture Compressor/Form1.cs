@@ -287,6 +287,8 @@ namespace Fallout4_Texture_Compressor
                     {
                         listBox1.Items.Add("new file size = " + filesize + " kb");
                     }
+                    //keep listbox scrolled to bottom
+                    listBox1.TopIndex = listBox1.Items.Count - 1;
                 }
                 form.Text = "Compressed from " + Math.Round(filessize / 1024, 3) + "mb to " + Math.Round(newfilessize / 1024, 3) + "mb Saved = " + Math.Round((filessize - newfilessize) / 1024, 3) + "mb";
             }
@@ -328,6 +330,7 @@ namespace Fallout4_Texture_Compressor
                 string line = process.StandardOutput.ReadLine();
                 if (line.Contains("height"))
                 {
+                    //workaround for rare int.parse errors
                     int temp;
                     if (int.TryParse(line.Substring(line.IndexOf("=") + 2, line.Length - line.IndexOf("=") - 2), out temp))
                     {
@@ -339,11 +342,17 @@ namespace Fallout4_Texture_Compressor
                         {
                             ddsinfo.height = int.Parse(line.Substring(line.IndexOf("=") + 2, line.Length - line.IndexOf("=") - 2), CultureInfo.InvariantCulture);
                         }
-                        catch (Exception ex) { MessageBox.Show("Couldn't parse dds height. Error log: " + ex.ToString());  }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Couldn't parse dds height. Save current message and next ones for providing more info about error. Error log: " + ex.ToString());
+                            MessageBox.Show("Height line unedited: " + line);
+                            MessageBox.Show("Height line edited: " + line.Substring(line.IndexOf("=") + 2, line.Length - line.IndexOf("=") - 2));
+                        }
                     }
                 }
                 if (line.Contains("width"))
                 {
+                    //workaround for rare int.parse errors
                     int temp;
                     if (int.TryParse(line.Substring(line.IndexOf("=") + 2, line.Length - line.IndexOf("=") - 2), out temp))
                     {
@@ -355,7 +364,12 @@ namespace Fallout4_Texture_Compressor
                         {
                             ddsinfo.width = int.Parse(line.Substring(line.IndexOf("=") + 2, line.Length - line.IndexOf("=") - 2), CultureInfo.InvariantCulture);
                         }
-                        catch (Exception ex) { MessageBox.Show("Couldn't parse dds height. Error log: " + ex.ToString()); }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Couldn't parse dds height. Save current message and next ones for providing more info about error. Error log: " + ex.ToString());
+                            MessageBox.Show("Height line unedited: " + line);
+                            MessageBox.Show("Height line edited: " + line.Substring(line.IndexOf("=") + 2, line.Length - line.IndexOf("=") - 2));
+                        }
                     }
                 }
                 if (line.Contains("format"))
