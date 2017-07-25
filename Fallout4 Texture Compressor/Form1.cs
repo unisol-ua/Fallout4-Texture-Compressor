@@ -366,9 +366,9 @@ namespace Fallout4_Texture_Compressor
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show("Couldn't parse dds height. Save current message and next ones for providing more info about error. Error log: " + ex.ToString());
-                            MessageBox.Show("Height line unedited: " + line);
-                            MessageBox.Show("Height line edited: " + line.Substring(line.IndexOf("=") + 2, line.Length - line.IndexOf("=") - 2));
+                            MessageBox.Show("Couldn't parse dds width. Save current message and next ones for providing more info about error. Error log: " + ex.ToString());
+                            MessageBox.Show("Width line unedited: " + line);
+                            MessageBox.Show("Width line edited: " + line.Substring(line.IndexOf("=") + 2, line.Length - line.IndexOf("=") - 2));
                         }
                     }
                 }
