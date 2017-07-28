@@ -283,7 +283,7 @@ namespace Fallout4_Texture_Compressor
                     }
                     filesize = Math.Round((Double)new FileInfo(file).Length / 1024, 1);
                     newfilessize += filesize;
-                    if (!listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Already compressed") || !listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Other format compress is unchecked, skipping"))
+                    if (!listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Already compressed") && !listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Other format compress is unchecked, skipping"))
                     {
                         listBox1.Items.Add("new file size = " + filesize + " kb");
                     }
@@ -291,6 +291,10 @@ namespace Fallout4_Texture_Compressor
                     listBox1.TopIndex = listBox1.Items.Count - 1;
                 }
                 form.Text = "Compressed from " + Math.Round(filessize / 1024, 3) + "mb to " + Math.Round(newfilessize / 1024, 3) + "mb Saved = " + Math.Round((filessize - newfilessize) / 1024, 3) + "mb";
+                listBox1.Items.Add("");
+                listBox1.Items.Add("Original files size = " + Math.Round(filessize / 1024, 3) + " mb");
+                listBox1.Items.Add("Compressed files size = " + Math.Round(newfilessize / 1024, 3) + " mb");
+                listBox1.Items.Add("Saved = " + Math.Round((filessize - newfilessize) / 1024, 3) + " mb");
             }
             else
             {
@@ -356,7 +360,7 @@ namespace Fallout4_Texture_Compressor
                     int temp;
                     if (int.TryParse(line.Substring(line.IndexOf("=") + 2, line.Length - line.IndexOf("=") - 2), out temp))
                     {
-                        ddsinfo.height = temp;
+                        ddsinfo.width = temp;
                     }
                     else
                     {
