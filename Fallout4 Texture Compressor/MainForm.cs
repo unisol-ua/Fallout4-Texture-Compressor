@@ -293,7 +293,7 @@ namespace Fallout4_Texture_Compressor
             }
             else
             {
-                MessageBox.Show("You need set destination folder");
+                MessageBox.Show("You need to set destination folder");
             }
         }
 
