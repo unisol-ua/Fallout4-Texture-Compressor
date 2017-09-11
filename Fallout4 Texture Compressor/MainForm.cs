@@ -36,258 +36,264 @@ namespace Fallout4_Texture_Compressor
 
         private void startbutton_Click(object sender, EventArgs e)
         {
-            //initial check
-            string path = pathtextbox.Text;
-            string[] allfiles = Directory.GetFiles(path, "*.dds", SearchOption.AllDirectories);
-            if (allfiles.Length > 0)
+            if (pathtextbox.Text != "")
             {
-                //visibility
-                listBox1.Visible = true;
-                listBox1.BringToFront();
-                optionsbutton.Visible = true;
-                exportlogbutton.Visible = true;
-                //main
-                double filessize = 0;
-                double newfilessize = 0;
-                MainForm form = this;
-                listBox1.Items.Clear();
-                double i = 0;
-                if (backup_check.Checked == true) // backup
+                string path = pathtextbox.Text;
+                string[] allfiles = Directory.GetFiles(path, "*.dds", SearchOption.AllDirectories);
+                if (allfiles.Length > 0)
                 {
-                    double sni = 0;
+                    //visibility
+                    listBox1.Visible = true;
+                    listBox1.BringToFront();
+                    optionsbutton.Visible = true;
+                    exportlogbutton.Visible = true;
+                    //main
+                    double filessize = 0;
+                    double newfilessize = 0;
+                    MainForm form = this;
+                    listBox1.Items.Clear();
+                    double i = 0;
+                    if (backup_check.Checked == true) // backup
+                    {
+                        double sni = 0;
+                        foreach (string file in allfiles)
+                        {
+                            i++;
+                            form.Text = "Copying files: " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
+                            FileInfo fileinf = new FileInfo(file);
+                            if ((ignoresn_check.Checked) && (fileinf.Name.Contains("_s") || fileinf.Name.Contains("_n")))
+                            {
+                                sni++;
+                            }
+                            string newfolders = fileinf.DirectoryName.Replace(pathtextbox.Text, "");
+                            Directory.CreateDirectory(Application.StartupPath + "\\backup" + newfolders);
+                            File.Copy(file, Application.StartupPath + "\\backup" + fileinf.FullName.Replace(pathtextbox.Text, ""), true);
+                        }
+                        form.Text = "Archiving files";
+                        string time = DateTime.Now.Second + "s_" + DateTime.Now.Minute + "m_" + DateTime.Now.Hour + "h_" + DateTime.Now.Day + "d_" + DateTime.Now.Month + "m_" + DateTime.Now.Year + "y";
+                        Process process = new Process();
+                        ProcessStartInfo startInfo = new ProcessStartInfo();
+                        startInfo.CreateNoWindow = true;
+                        startInfo.UseShellExecute = false;
+                        startInfo.RedirectStandardOutput = true;
+                        startInfo.RedirectStandardError = true;
+                        startInfo.FileName = Application.StartupPath + "\\bin\\7za.exe";
+                        if (backupname.Text == "") { startInfo.Arguments = "a backup_" + time + ".zip \"" + Application.StartupPath + "\\backup\\*\" -mx6 -o" + Application.StartupPath + "\\"; }
+                        else { startInfo.Arguments = "a \"" + backupname.Text + "_" + time + ".zip\" \"" + Application.StartupPath + "\\backup\\*\" -mx6 -o" + Application.StartupPath + "\\"; }
+                        process.StartInfo = startInfo;
+                        process.Start();
+                        process.WaitForExit();
+                        Directory.Delete(Application.StartupPath + "\\backup", true);
+                        listBox1.Items.Add("Backup:");
+                        listBox1.Items.Add("Archived " + (i - sni) + " of " + i + " files");
+                        if (ignoresn_check.Checked) listBox1.Items.Add(sni + " files were ignored");
+                        listBox1.Items.Add("");
+                    }
+                    //compressing/resizing
+                    listBox1.Items.Add("Compression:");
+                    i = 0;
                     foreach (string file in allfiles)
                     {
-                        i++;
-                        form.Text = "Copying files: " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
                         FileInfo fileinf = new FileInfo(file);
-                        if ((ignoresn_check.Checked) && (fileinf.Name.Contains("_s") || fileinf.Name.Contains("_n")))
+                        listBox1.Items.Add(i + " : " + file);
+                        if (ignoresn_check.Checked && (fileinf.Name.Contains("_s.dds") || fileinf.Name.Contains("_n.dds") || fileinf.Name.Contains("_S.dds") || fileinf.Name.Contains("_N.dds")))
                         {
-                            sni++;
-                        }
-                        string newfolders = fileinf.DirectoryName.Replace(pathtextbox.Text, "");
-                        Directory.CreateDirectory(Application.StartupPath + "\\backup" + newfolders);
-                        File.Copy(file, Application.StartupPath + "\\backup" + fileinf.FullName.Replace(pathtextbox.Text, ""), true);
-                    }
-                    form.Text = "Archiving files";
-                    string time = DateTime.Now.Second + "s_" + DateTime.Now.Minute + "m_" + DateTime.Now.Hour + "h_" + DateTime.Now.Day + "d_" + DateTime.Now.Month + "m_" + DateTime.Now.Year + "y";
-                    Process process = new Process();
-                    ProcessStartInfo startInfo = new ProcessStartInfo();
-                    startInfo.CreateNoWindow = true;
-                    startInfo.UseShellExecute = false;
-                    startInfo.RedirectStandardOutput = true;
-                    startInfo.RedirectStandardError = true;
-                    startInfo.FileName = Application.StartupPath + "\\bin\\7za.exe";
-                    if (backupname.Text == "") { startInfo.Arguments = "a backup_" + time + ".zip \"" + Application.StartupPath + "\\backup\\*\" -mx6 -o" + Application.StartupPath + "\\"; }
-                    else { startInfo.Arguments = "a \"" + backupname.Text + "_" + time + ".zip\" \"" + Application.StartupPath + "\\backup\\*\" -mx6 -o" + Application.StartupPath + "\\"; }
-                    process.StartInfo = startInfo;
-                    process.Start();
-                    process.WaitForExit();
-                    Directory.Delete(Application.StartupPath + "\\backup", true);
-                    listBox1.Items.Add("Backup:");
-                    listBox1.Items.Add("Archived " + (i - sni) + " of " + i + " files");
-                    if (ignoresn_check.Checked) listBox1.Items.Add(sni + " files were ignored");
-                    listBox1.Items.Add("");
-                }
-                //compressing/resizing
-                listBox1.Items.Add("Compression:");
-                i = 0;
-                foreach (string file in allfiles)
-                {
-                    FileInfo fileinf = new FileInfo(file);
-                    listBox1.Items.Add( i + " : " + file);
-                    if (ignoresn_check.Checked && (fileinf.Name.Contains("_s.dds") || fileinf.Name.Contains("_n.dds") || fileinf.Name.Contains("_S.dds") || fileinf.Name.Contains("_N.dds")))
-                    {
-                        listBox1.Items.Add("Speculars and normals are ignored, skipping");
-                        i++;
-                        form.Text = "Compressing files : " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
-                    }
-                    else
-                    {
-                        ddsfileinfo ddsinfo = checkdds(file);
-                        if (ddsinfo.format.Contains("Unsupported format"))
-                        {
+                            listBox1.Items.Add("Speculars and normals are ignored, skipping");
                             i++;
                             form.Text = "Compressing files : " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
                         }
                         else
                         {
-                            i++;
-                            double filesize = Math.Round((Double)new FileInfo(file).Length / 1024, 1);
-                            filessize += filesize;
-                            listBox1.Items.Add("file size = " + filesize + " kb");
-                            int size = 0;
-                            if (ddsinfo.height > ddsinfo.width) { size = ddsinfo.height; } else { size = ddsinfo.width; }
-                            if (compressbc_check.Checked == true && resize_check.Checked == true) // compress + resize
+                            ddsfileinfo ddsinfo = checkdds(file);
+                            if (ddsinfo.format.Contains("Unsupported format"))
                             {
-                                int ifgreater = 8192;
-                                if (texturesize_combo.Text.Contains("512")) { ifgreater = 512; }
-                                else if (texturesize_combo.Text.Contains("1024")) { ifgreater = 1024; }
-                                else if (texturesize_combo.Text.Contains("2048")) { ifgreater = 2048; }
-                                else if (texturesize_combo.Text.Contains("4096")) { ifgreater = 4096; }
-                                else if (texturesize_combo.Text.Contains("128")) { ifgreater = 128; }
-                                else if (texturesize_combo.Text.Contains("256")) { ifgreater = 256; }
-                                else if (texturesize_combo.Text.Contains("8192")) { ifgreater = 8192; }
-                                else if (texturesize_combo.Text.Contains("4")) { ifgreater = 4; }
-                                else if (texturesize_combo.Text.Contains("8")) { ifgreater = 8; }
-                                else if (texturesize_combo.Text.Contains("16")) { ifgreater = 16; }
-                                else if (texturesize_combo.Text.Contains("32")) { ifgreater = 32; }
-                                else if (texturesize_combo.Text.Contains("64")) { ifgreater = 64; }
-                                else
+                                i++;
+                                form.Text = "Compressing files : " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
+                            }
+                            else
+                            {
+                                i++;
+                                double filesize = Math.Round((Double)new FileInfo(file).Length / 1024, 1);
+                                filessize += filesize;
+                                listBox1.Items.Add("file size = " + filesize + " kb");
+                                int size = 0;
+                                if (ddsinfo.height > ddsinfo.width) { size = ddsinfo.height; } else { size = ddsinfo.width; }
+                                if (compressbc_check.Checked == true && resize_check.Checked == true) // compress + resize
                                 {
-                                    MessageBox.Show("Avoid editing resize combobox's text. Use only numbers for custom parameter (without if<> and any words). Resize parameter has been set to custom number.");
-                                    try { ifgreater = int.Parse(texturesize_combo.Text); }
-                                    catch { MessageBox.Show("Failed parse custom parameter. Parameter has been reset to 8192"); ifgreater = 8192; }
-                                }
-                                bool needtogenmm = false;
-                                if (size > ifgreater)//if size is bigger than compared value
-                                {
-                                    form.Text = "Compressing and resizing files : " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
-                                    if (!ddsinfo.format.Contains("BC1"))//skip if already bc1 (only resize)
+                                    int ifgreater = 8192;
+                                    if (texturesize_combo.Text.Contains("512")) { ifgreater = 512; }
+                                    else if (texturesize_combo.Text.Contains("1024")) { ifgreater = 1024; }
+                                    else if (texturesize_combo.Text.Contains("2048")) { ifgreater = 2048; }
+                                    else if (texturesize_combo.Text.Contains("4096")) { ifgreater = 4096; }
+                                    else if (texturesize_combo.Text.Contains("128")) { ifgreater = 128; }
+                                    else if (texturesize_combo.Text.Contains("256")) { ifgreater = 256; }
+                                    else if (texturesize_combo.Text.Contains("8192")) { ifgreater = 8192; }
+                                    else if (texturesize_combo.Text.Contains("4")) { ifgreater = 4; }
+                                    else if (texturesize_combo.Text.Contains("8")) { ifgreater = 8; }
+                                    else if (texturesize_combo.Text.Contains("16")) { ifgreater = 16; }
+                                    else if (texturesize_combo.Text.Contains("32")) { ifgreater = 32; }
+                                    else if (texturesize_combo.Text.Contains("64")) { ifgreater = 64; }
+                                    else
                                     {
-                                        if (ddsinfo.format.Contains("BC"))//check if bc format and compress to bc1
+                                        MessageBox.Show("Avoid editing resize combobox's text. Use only numbers for custom parameter (without if<> and any words). Resize parameter has been set to custom number.");
+                                        try { ifgreater = int.Parse(texturesize_combo.Text); }
+                                        catch { MessageBox.Show("Failed parse custom parameter. Parameter has been reset to 8192"); ifgreater = 8192; }
+                                    }
+                                    bool needtogenmm = false;
+                                    if (size > ifgreater)//if size is bigger than compared value
+                                    {
+                                        form.Text = "Compressing and resizing files : " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
+                                        if (!ddsinfo.format.Contains("BC1"))//skip if already bc1 (only resize)
                                         {
-                                            if (safecompress_check.Checked && ddsinfo.alpha)//safe compression and alpha
+                                            if (ddsinfo.format.Contains("BC"))//check if bc format and compress to bc1
                                             {
-                                                if (ddsinfo.format.Contains("BC2") || ddsinfo.format.Contains("BC3"))//skip on bc2 or bc3
+                                                if (safecompress_check.Checked && ddsinfo.alpha)//safe compression and alpha
                                                 {
-                                                    listBox1.Items.Add("Safe compress checked, texture has alpha channel, skipping");
+                                                    if (ddsinfo.format.Contains("BC2") || ddsinfo.format.Contains("BC3"))//skip on bc2 or bc3
+                                                    {
+                                                        listBox1.Items.Add("Safe compress checked, texture has alpha channel, skipping");
+                                                    }
+                                                    else
+                                                    {
+                                                        if (ddsinfo.format.Contains("SRGB"))
+                                                        {
+                                                            texconv("\"" + file + "\" -y -f BC3_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
+                                                            listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
+                                                            listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
+                                                            listBox1.Items.Add("new format = BC3_UNORM_SRGB");
+                                                        }
+                                                        else
+                                                        {
+                                                            texconv("\"" + file + "\" -y -f BC3_UNORM -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
+                                                            listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
+                                                            listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
+                                                            listBox1.Items.Add("new format = BC3_UNORM");
+                                                        }
+                                                    }
                                                 }
                                                 else
                                                 {
                                                     if (ddsinfo.format.Contains("SRGB"))
                                                     {
-                                                        texconv("\"" + file + "\" -y -f BC3_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
+                                                        texconv("\"" + file + "\" -y -f BC1_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
                                                         listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
                                                         listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
-                                                        listBox1.Items.Add("new format = BC3_UNORM_SRGB");
+                                                        listBox1.Items.Add("new format = BC1_UNORM_SRGB");
                                                     }
                                                     else
                                                     {
-                                                        texconv("\"" + file + "\" -y -f BC3_UNORM -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
+                                                        texconv("\"" + file + "\" -y -f BC1_UNORM -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
                                                         listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
                                                         listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
-                                                        listBox1.Items.Add("new format = BC3_UNORM");
+                                                        listBox1.Items.Add("new format = BC1_UNORM");
                                                     }
                                                 }
                                             }
-                                            else
+                                            else if (compressother_check.Checked == true)//if other format and compress checked, compress to selected bc
                                             {
                                                 if (ddsinfo.format.Contains("SRGB"))
                                                 {
-                                                    texconv("\"" + file + "\" -y -f BC1_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
+                                                    texconv("\"" + file + "\" -y -f " + compressother_combo.Text + "_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
                                                     listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
                                                     listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
-                                                    listBox1.Items.Add("new format = BC1_UNORM_SRGB");
+                                                    listBox1.Items.Add("new format = " + compressother_combo.Text + "_UNORM_SRGB");
                                                 }
                                                 else
                                                 {
-                                                    texconv("\"" + file + "\" -y -f BC1_UNORM -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
+                                                    texconv("\"" + file + "\" -y -f " + compressother_combo.Text + "_UNORM -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
                                                     listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
                                                     listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
-                                                    listBox1.Items.Add("new format = BC1_UNORM");
+                                                    listBox1.Items.Add("new format = " + compressother_combo.Text + "_UNORM");
                                                 }
-                                            }
-                                        }
-                                        else if (compressother_check.Checked == true)//if other format and compress checked, compress to selected bc
-                                        {
-                                            if (ddsinfo.format.Contains("SRGB"))
-                                            {
-                                                texconv("\"" + file + "\" -y -f " + compressother_combo.Text + "_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
-                                                listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
-                                                listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
-                                                listBox1.Items.Add("new format = " + compressother_combo.Text + "_UNORM_SRGB");
                                             }
                                             else
                                             {
-                                                texconv("\"" + file + "\" -y -f " + compressother_combo.Text + "_UNORM -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
-                                                listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
-                                                listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
-                                                listBox1.Items.Add("new format = " + compressother_combo.Text + "_UNORM");
+                                                listBox1.Items.Add("Other format compress is unchecked, skipping");
                                             }
                                         }
-                                        else
+                                        else//no need to compress
                                         {
-                                            listBox1.Items.Add("Other format compress is unchecked, skipping");
+                                            texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
+                                            listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
+                                            listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
                                         }
+                                        needtogenmm = true;
                                     }
-                                    else//no need to compress
+                                    else//no need to resize
                                     {
-                                        texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
-                                        listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
-                                        listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
+                                        form.Text = "Compressing files : " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
+                                        //compress func
+                                        compress(ddsinfo, file, fileinf);
                                     }
-                                    needtogenmm = true;
+                                    if (needtogenmm)
+                                    {
+                                        //gen mipmaps
+                                        texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 0");
+                                    }
                                 }
-                                else//no need to resize
+                                else if (compressbc_check.Checked == true) //compress
                                 {
                                     form.Text = "Compressing files : " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
                                     //compress func
                                     compress(ddsinfo, file, fileinf);
                                 }
-                                if (needtogenmm)
+                                else if (resize_check.Checked == true) //resize
                                 {
-                                    //gen mipmaps
-                                    texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 0");
+                                    form.Text = "Resizing files : " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
+                                    int ifgreater = 8192;
+                                    if (texturesize_combo.Text.Contains("512")) { ifgreater = 512; }
+                                    else if (texturesize_combo.Text.Contains("1024")) { ifgreater = 1024; }
+                                    else if (texturesize_combo.Text.Contains("2048")) { ifgreater = 2048; }
+                                    else if (texturesize_combo.Text.Contains("4096")) { ifgreater = 4096; }
+                                    else if (texturesize_combo.Text.Contains("128")) { ifgreater = 128; }
+                                    else if (texturesize_combo.Text.Contains("256")) { ifgreater = 256; }
+                                    else if (texturesize_combo.Text.Contains("8192")) { ifgreater = 8192; }
+                                    else if (texturesize_combo.Text.Contains("4")) { ifgreater = 4; }
+                                    else if (texturesize_combo.Text.Contains("8")) { ifgreater = 8; }
+                                    else if (texturesize_combo.Text.Contains("16")) { ifgreater = 16; }
+                                    else if (texturesize_combo.Text.Contains("32")) { ifgreater = 32; }
+                                    else if (texturesize_combo.Text.Contains("64")) { ifgreater = 64; }
+                                    else
+                                    {
+                                        MessageBox.Show("Avoid editing resize combobox. Use only numbers for custom paramter (without if<> and any words). Resize parameter has been set to custom number.");
+                                        try { ifgreater = int.Parse(texturesize_combo.Text); }
+                                        catch { MessageBox.Show("Failed parse custom parameter. Parameter has been reset to 8192"); ifgreater = 8192; }
+                                    }
+                                    if (size > ifgreater)
+                                    {
+                                        texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
+                                        //gen mipmaps
+                                        texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 0");
+                                        listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
+                                        listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
+                                    }
                                 }
-                            }
-                            else if (compressbc_check.Checked == true) //compress
-                            {
-                                form.Text = "Compressing files : " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
-                                //compress func
-                                compress(ddsinfo, file, fileinf);
-                            }
-                            else if (resize_check.Checked == true) //resize
-                            {
-                                form.Text = "Resizing files : " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
-                                int ifgreater = 8192;
-                                if (texturesize_combo.Text.Contains("512")) { ifgreater = 512; }
-                                else if (texturesize_combo.Text.Contains("1024")) { ifgreater = 1024; }
-                                else if (texturesize_combo.Text.Contains("2048")) { ifgreater = 2048; }
-                                else if (texturesize_combo.Text.Contains("4096")) { ifgreater = 4096; }
-                                else if (texturesize_combo.Text.Contains("128")) { ifgreater = 128; }
-                                else if (texturesize_combo.Text.Contains("256")) { ifgreater = 256; }
-                                else if (texturesize_combo.Text.Contains("8192")) { ifgreater = 8192; }
-                                else if (texturesize_combo.Text.Contains("4")) { ifgreater = 4; }
-                                else if (texturesize_combo.Text.Contains("8")) { ifgreater = 8; }
-                                else if (texturesize_combo.Text.Contains("16")) { ifgreater = 16; }
-                                else if (texturesize_combo.Text.Contains("32")) { ifgreater = 32; }
-                                else if (texturesize_combo.Text.Contains("64")) { ifgreater = 64; }
-                                else
+                                filesize = Math.Round((Double)new FileInfo(file).Length / 1024, 1);
+                                newfilessize += filesize;
+                                if (!listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Already compressed") && !listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Other format compress is unchecked, skipping") && !listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Safe compress checked, texture has alpha channel, skipping"))
                                 {
-                                    MessageBox.Show("Avoid editing resize combobox. Use only numbers for custom paramter (without if<> and any words). Resize parameter has been set to custom number.");
-                                    try { ifgreater = int.Parse(texturesize_combo.Text); }
-                                    catch { MessageBox.Show("Failed parse custom parameter. Parameter has been reset to 8192"); ifgreater = 8192; }
+                                    listBox1.Items.Add("new file size = " + filesize + " kb");
                                 }
-                                if (size > ifgreater)
-                                {
-                                    texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
-                                    //gen mipmaps
-                                    texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 0");
-                                    listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
-                                    listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
-                                }
+                                //keep listbox scrolled to bottom
+                                listBox1.TopIndex = listBox1.Items.Count - 1;
                             }
-                            filesize = Math.Round((Double)new FileInfo(file).Length / 1024, 1);
-                            newfilessize += filesize;
-                            if (!listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Already compressed") && !listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Other format compress is unchecked, skipping") && !listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Safe compress checked, texture has alpha channel, skipping"))
-                            {
-                                listBox1.Items.Add("new file size = " + filesize + " kb");
-                            }
-                            //keep listbox scrolled to bottom
-                            listBox1.TopIndex = listBox1.Items.Count - 1;
                         }
                     }
+                    if (Directory.Exists(Application.StartupPath + "\\temp")) Directory.Delete(Application.StartupPath + "\\temp", true);
+                    form.Text = "Compressed from " + Math.Round(filessize / 1024, 3) + "mb to " + Math.Round(newfilessize / 1024, 3) + "mb Saved = " + Math.Round((filessize - newfilessize) / 1024, 3) + "mb";
+                    listBox1.Items.Add("");
+                    listBox1.Items.Add("Original files size = " + Math.Round(filessize / 1024, 3) + " mb");
+                    listBox1.Items.Add("Compressed files size = " + Math.Round(newfilessize / 1024, 3) + " mb");
+                    listBox1.Items.Add("Saved = " + Math.Round((filessize - newfilessize) / 1024, 3) + " mb");
                 }
-                if (Directory.Exists(Application.StartupPath + "\\temp")) Directory.Delete(Application.StartupPath + "\\temp", true);
-                form.Text = "Compressed from " + Math.Round(filessize / 1024, 3) + "mb to " + Math.Round(newfilessize / 1024, 3) + "mb Saved = " + Math.Round((filessize - newfilessize) / 1024, 3) + "mb";
-                listBox1.Items.Add("");
-                listBox1.Items.Add("Original files size = " + Math.Round(filessize / 1024, 3) + " mb");
-                listBox1.Items.Add("Compressed files size = " + Math.Round(newfilessize / 1024, 3) + " mb");
-                listBox1.Items.Add("Saved = " + Math.Round((filessize - newfilessize) / 1024, 3) + " mb");
+                else
+                {
+                    MessageBox.Show("No .dds files found.");
+                }
             }
             else
             {
-                MessageBox.Show("No .dds files found.");
+                MessageBox.Show("You need set destination folder");
             }
         }
 
