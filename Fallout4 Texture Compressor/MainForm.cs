@@ -63,7 +63,7 @@ namespace Fallout4_Texture_Compressor
                             i++;
                             form.Text = "Copying files: " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
                             FileInfo fileinf = new FileInfo(file);
-                            if ((ignoresn_check.Checked) && (fileinf.Name.Contains("_s") || fileinf.Name.Contains("_n")))
+                            if ((ignoresn_check.Checked) && (fileinf.Name.Contains("_s") || fileinf.Name.Contains("_n") || fileinf.Name.Contains("_g.dds") || fileinf.Name.Contains("_S") || fileinf.Name.Contains("_N") || fileinf.Name.Contains("_G.dds")))
                             {
                                 sni++;
                             }
@@ -98,7 +98,7 @@ namespace Fallout4_Texture_Compressor
                     {
                         FileInfo fileinf = new FileInfo(file);
                         listBox1.Items.Add(i + " : " + file);
-                        if (ignoresn_check.Checked && (fileinf.Name.Contains("_s.dds") || fileinf.Name.Contains("_n.dds") || fileinf.Name.Contains("_S.dds") || fileinf.Name.Contains("_N.dds")))
+                        if (ignoresn_check.Checked && (fileinf.Name.Contains("_s.dds") || fileinf.Name.Contains("_n.dds") || fileinf.Name.Contains("_g.dds") || fileinf.Name.Contains("_S.dds") || fileinf.Name.Contains("_N.dds") || fileinf.Name.Contains("_G.dds")))
                         {
                             listBox1.Items.Add("Speculars and normals are ignored, skipping");
                             i++;
