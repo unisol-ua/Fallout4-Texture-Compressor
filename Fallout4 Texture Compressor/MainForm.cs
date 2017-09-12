@@ -67,9 +67,12 @@ namespace Fallout4_Texture_Compressor
                             {
                                 sni++;
                             }
-                            string newfolders = fileinf.DirectoryName.Replace(pathtextbox.Text, "");
-                            Directory.CreateDirectory(Application.StartupPath + "\\backup" + newfolders);
-                            File.Copy(file, Application.StartupPath + "\\backup" + fileinf.FullName.Replace(pathtextbox.Text, ""), true);
+                            else
+                            {
+                                string newfolders = fileinf.DirectoryName.Replace(pathtextbox.Text, "");
+                                Directory.CreateDirectory(Application.StartupPath + "\\backup" + newfolders);
+                                File.Copy(file, Application.StartupPath + "\\backup" + fileinf.FullName.Replace(pathtextbox.Text, ""), true);
+                            }
                         }
                         form.Text = "Archiving files";
                         string time = DateTime.Now.Second + "s_" + DateTime.Now.Minute + "m_" + DateTime.Now.Hour + "h_" + DateTime.Now.Day + "d_" + DateTime.Now.Month + "m_" + DateTime.Now.Year + "y";
