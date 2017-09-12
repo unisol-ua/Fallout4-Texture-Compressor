@@ -32,6 +32,8 @@ namespace Fallout4_Texture_Compressor
                     }
                 }
             }
+            if (Directory.Exists(Application.StartupPath + "\\temp")) Directory.Delete(Application.StartupPath + "\\temp", true);
+            if (Directory.Exists(Application.StartupPath + "\\backup")) Directory.Delete(Application.StartupPath + "\\backup", true);
         }
 
         private void startbutton_Click(object sender, EventArgs e)
@@ -470,11 +472,11 @@ namespace Fallout4_Texture_Compressor
             //safe mode
             if (safecompress_check.Checked == true && (ddsinfo.format.Contains("BC2") || ddsinfo.format.Contains("BC3") || ddsinfo.format.Contains("BC4") || ddsinfo.format.Contains("BC5") || ddsinfo.format.Contains("BC7")))
             {
-                Directory.CreateDirectory(Application.StartupPath + "\\temp");
+                if(!Directory.Exists(Application.StartupPath + "\\temp")) Directory.CreateDirectory(Application.StartupPath + "\\temp");
                 FileInfo fileinf = new FileInfo(file);
                 if (ddsinfo.format.Contains("BC3"))
                 {
-                    File.Copy(file, Application.StartupPath + "\\temp\\" + fileinf.Name);
+                    File.Copy(file, Application.StartupPath + "\\temp\\" + fileinf.Name, true);
                 }
                 else
                 {
@@ -546,7 +548,6 @@ namespace Fallout4_Texture_Compressor
                 }
                 process.WaitForExit();
                 if (blocks6 > 0 && blocks8 > 0) ddsinfo.alpha = true;
-                //Directory.Delete(Application.StartupPath + "\\temp", true);
             }
             listBox1.Items.Add("alpha = " + ddsinfo.alpha.ToString());
             return ddsinfo;
