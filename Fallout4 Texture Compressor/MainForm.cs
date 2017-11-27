@@ -198,10 +198,20 @@ namespace Fallout4_Texture_Compressor
                                             {
                                                 if (ddsinfo.format.Contains("SRGB"))
                                                 {
-                                                    texconv("\"" + file + "\" -y -f " + compressother_combo.Text + "_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
-                                                    listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
-                                                    listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
-                                                    listBox1.Items.Add("new format = " + compressother_combo.Text + "_UNORM_SRGB");
+                                                    if (compressother_combo.Text == "BC5")
+                                                    {
+                                                        texconv("\"" + file + "\" -y -f BC3_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
+                                                        listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
+                                                        listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
+                                                        listBox1.Items.Add("new format = BC3_UNORM_SRGB");
+                                                    }
+                                                    else
+                                                    {
+                                                        texconv("\"" + file + "\" -y -f " + compressother_combo.Text + "_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
+                                                        listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
+                                                        listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
+                                                        listBox1.Items.Add("new format = " + compressother_combo.Text + "_UNORM_SRGB");
+                                                    }
                                                 }
                                                 else
                                                 {
@@ -375,8 +385,16 @@ namespace Fallout4_Texture_Compressor
                 {
                     if (ddsinfo.format.Contains("SRGB"))
                     {
-                        texconv("\"" + file + "\" -y -f " + compressother_combo.Text + "_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
-                        listBox1.Items.Add("new format = " + compressother_combo.Text + "_UNORM_SRGB");
+                        if (compressother_combo.Text == "BC5")
+                        {
+                            texconv("\"" + file + "\" -y -f BC3_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
+                            listBox1.Items.Add("new format = BC3_UNORM_SRGB");
+                        }
+                        else
+                        {
+                            texconv("\"" + file + "\" -y -f " + compressother_combo.Text + "_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
+                            listBox1.Items.Add("new format = " + compressother_combo.Text + "_UNORM_SRGB");
+                        }
                     }
                     else
                     {
@@ -467,7 +485,7 @@ namespace Fallout4_Texture_Compressor
                     ddsinfo.height = 0;
                 }
             }
-            process.WaitForExit();
+            //process.WaitForExit();
             listBox1.Items.Add("height = " + ddsinfo.height);
             listBox1.Items.Add(" width = " + ddsinfo.width);
             listBox1.Items.Add("format = " + ddsinfo.format);
@@ -549,7 +567,7 @@ namespace Fallout4_Texture_Compressor
                         }
                     }
                 }
-                process.WaitForExit();
+                //process.WaitForExit();
                 if (blocks6 > 0 && blocks8 > 0) ddsinfo.alpha = true;
             }
             listBox1.Items.Add("alpha = " + ddsinfo.alpha.ToString());
