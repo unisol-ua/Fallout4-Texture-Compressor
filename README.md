@@ -13,3 +13,6 @@ and [7-zip standalone console version](http://www.7-zip.org/download.html).
 Create /bin/ directory and put them there.
 
 Note: this only needed for manual build, all files are included in release section
+
+# Preview
+![settings](https://i.imgur.com/y44A8SG.png)
