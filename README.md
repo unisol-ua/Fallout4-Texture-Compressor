@@ -3,6 +3,7 @@ Compress and resize Fallout 4 textures
 
 # Download
 - [Admirativ/Fallout4-Texture-Compressor/releases](https://github.com/Admirativ/Fallout4-Texture-Compressor/releases)
+- [Nexusmods](https://www.nexusmods.com/fallout4/mods/25691/)
 
 Also you need Microsoft Net Framework 4.5.2
 
