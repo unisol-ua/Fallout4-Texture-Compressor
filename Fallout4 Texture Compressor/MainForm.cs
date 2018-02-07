@@ -194,7 +194,7 @@ namespace Fallout4_Texture_Compressor
 
         private void compress(ddsfileinfo ddsinfo, string file, FileInfo fileinf)
         {
-            int ddslvl = 0;
+            int ddslvl = 10;
             if (ddsinfo.format.Contains("BC1")) ddslvl = 1;
             else if (ddsinfo.format.Contains("BC2")) ddslvl = 3;
             else if (ddsinfo.format.Contains("BC3")) ddslvl = 3;
