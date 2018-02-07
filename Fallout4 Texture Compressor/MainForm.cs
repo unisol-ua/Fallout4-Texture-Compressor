@@ -159,7 +159,7 @@ namespace Fallout4_Texture_Compressor
                         listBox1.Items.Add("");
                         listBox1.Items.Add("Original files size = " + Math.Round(filessize / 1024, 3) + " mb");
                         listBox1.Items.Add("Compressed files size = " + Math.Round(newfilessize / 1024, 3) + " mb");
-                        listBox1.Items.Add("Saved = " + (filessize - newfilessize) + " mb");
+                        listBox1.Items.Add("Saved = " + Math.Round((filessize - newfilessize) / 1024, 3) + " mb");
                         listBox1.TopIndex = listBox1.Items.Count - 1;
                     }
                     else
