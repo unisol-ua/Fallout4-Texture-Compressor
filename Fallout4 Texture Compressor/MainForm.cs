@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
@@ -13,7 +15,11 @@ namespace Fallout4_Texture_Compressor
     public partial class MainForm : Form
     {
         int compresslvl, compressalphalvl;
+        double originalfilessize = 0, compressedfilessize = 0;
+        string compresswithalpha, compressnoalpha, texturesize;
         bool ba2 = false;
+        int currentthreads = 0;
+        Queue<string> logqueue;
 
         public MainForm()
         {
@@ -44,7 +50,32 @@ namespace Fallout4_Texture_Compressor
         {
             if (pathtextbox.Text != "")
             {
-                if (!ba2)
+                //set vars
+                if (compressnoalpha_combo.Text.Contains("BC1")) compresslvl = 1;
+                else if (compressnoalpha_combo.Text.Contains("BC3")) compresslvl = 3;
+                else if (compressnoalpha_combo.Text.Contains("BC5")) compresslvl = 5;
+                else if (compressnoalpha_combo.Text.Contains("BC7")) compresslvl = 7;
+
+                if (compresswithalpha_combo.Text.Contains("BC1")) compressalphalvl = 1;
+                else if (compresswithalpha_combo.Text.Contains("BC3")) compressalphalvl = 3;
+                else if (compresswithalpha_combo.Text.Contains("BC5")) compressalphalvl = 5;
+                else if (compresswithalpha_combo.Text.Contains("BC7")) compressalphalvl = 7;
+
+                compresswithalpha = compresswithalpha_combo.Text;
+                compressnoalpha = compressnoalpha_combo.Text;
+                texturesize = texturesize_combo.Text;
+                logqueue = new Queue<string>();
+
+                originalfilessize = 0;
+                compressedfilessize = 0;
+
+                optionsbutton.Text = "Options";
+
+                if (ba2)
+                {
+                    ba2compress();
+                }
+                else
                 {
                     string path = pathtextbox.Text;
                     string[] allfiles = Directory.GetFiles(path, "*.dds", SearchOption.AllDirectories);
@@ -55,19 +86,10 @@ namespace Fallout4_Texture_Compressor
                         listBox1.BringToFront();
                         optionsbutton.Visible = true;
                         exportlogbutton.Visible = true;
-                        //main
-                        if (compressnoalpha_combo.Text.Contains("BC1")) compresslvl = 1;
-                        else if (compressnoalpha_combo.Text.Contains("BC3")) compresslvl = 3;
-                        else if (compressnoalpha_combo.Text.Contains("BC5")) compresslvl = 5;
-                        else if (compressnoalpha_combo.Text.Contains("BC7")) compresslvl = 7;
+                        //
+                        Stopwatch watch = new Stopwatch();
+                        watch.Start();
 
-                        if (compresswithalpha_combo.Text.Contains("BC1")) compressalphalvl = 1;
-                        else if (compresswithalpha_combo.Text.Contains("BC3")) compressalphalvl = 3;
-                        else if (compresswithalpha_combo.Text.Contains("BC5")) compressalphalvl = 5;
-                        else if (compresswithalpha_combo.Text.Contains("BC7")) compressalphalvl = 7;
-
-                        double filessize = 0;
-                        double newfilessize = 0;
                         MainForm form = this;
                         listBox1.Items.Clear();
                         double i = 0;
@@ -111,55 +133,56 @@ namespace Fallout4_Texture_Compressor
                             listBox1.Items.Add("");
                         }
 
+                        //////////
                         listBox1.Items.Add("Compression:");
                         i = 0;
-                        foreach (string file in allfiles)
+                        if (threading_check.Checked)
                         {
-                            FileInfo fileinf = new FileInfo(file);
-                            listBox1.Items.Add(i + " : " + file);
-                            if (ignoresn_check.Checked && (fileinf.Name.Contains("_s.dds") || fileinf.Name.Contains("_n.dds") || fileinf.Name.Contains("_g.dds") || fileinf.Name.Contains("_S.dds") || fileinf.Name.Contains("_N.dds") || fileinf.Name.Contains("_G.dds")))
+                            int maxthreads = int.Parse(threads_combo.Text);
+                            if (allfiles.Length < maxthreads) maxthreads = allfiles.Length;
+                            int files = 0;
+                            while(files < allfiles.Length || currentthreads > 0)
                             {
-                                listBox1.Items.Add("Speculars and normals are ignored, skipping");
-                                i++;
-                                form.Text = "Compressing files: " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
+                                if(currentthreads < maxthreads && files < allfiles.Length)
+                                {
+                                    startcompressthread(allfiles[files], ignoresn_check.Checked, files+1);
+                                    currentthreads++;
+                                    files++;
+                                    i++;
+                                }
+                                if (logqueue.Count > 0) if(logqueue.Peek() != null) listBox1.Items.Add(logqueue.Dequeue());
+                                form.Text = "Compressing files: " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%" + " Threads: " + currentthreads;
+                                listBox1.TopIndex = listBox1.Items.Count - 1;
+                                Thread.Sleep(10);
                             }
-                            else
+                            if (logqueue.Count > 0)
                             {
-                                ddsfileinfo ddsinfo = checkdds(file);
-                                if (ddsinfo.format.Contains("Unsupported format"))
-                                {
-                                    i++;
-                                    form.Text = "Compressing files: " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
-                                }
-                                else
-                                {
-                                    i++;
-                                    double filesize = Math.Round((Double)new FileInfo(file).Length / 1024, 1);
-                                    filessize += filesize;
-                                    listBox1.Items.Add("file size = " + filesize + " kb");
-                                    //compress
-                                    if (compress_check.Checked) compress(ddsinfo, file, fileinf);
-                                    //resize
-                                    if (resize_check.Checked) resize(ddsinfo, file, fileinf);
-                                    //
-                                    form.Text = "Compressing files: " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
-                                    double newfilesize = Math.Round((Double)new FileInfo(file).Length / 1024, 1);
-                                    newfilessize += newfilesize;
-                                    if (!listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Already compressed") && !listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Other format compress is unchecked, skipping") && !listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Safe compress checked, texture has alpha channel, skipping"))
-                                    {
-                                        listBox1.Items.Add("new file size = " + newfilesize + " kb");
-                                    }
-                                    //keep listbox scrolled to bottom
-                                    listBox1.TopIndex = listBox1.Items.Count - 1;
-                                }
+                                string[] fixqueue = logqueue.ToArray();
+                                logqueue.Clear();
+                                foreach (string entry in fixqueue) listBox1.Items.Add(entry);
+                            }
+                            listBox1.TopIndex = listBox1.Items.Count - 1;
+                        }
+                        else
+                        {
+                            foreach (string file in allfiles)
+                            {
+                                i++;
+                                compressmaster(file, ignoresn_check.Checked, (int)i, false);
+                                form.Text = "Compressing files: " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
+                                listBox1.TopIndex = listBox1.Items.Count - 1;
                             }
                         }
                         if (Directory.Exists(Application.StartupPath + "\\temp")) Directory.Delete(Application.StartupPath + "\\temp", true);
-                        form.Text = "Compressed from " + Math.Round(filessize / 1024, 3) + "mb to " + Math.Round(newfilessize / 1024, 3) + "mb Saved = " + Math.Round((filessize - newfilessize) / 1024, 3) + "mb";
+                        form.Text = "Compressed from " + Math.Round(originalfilessize / 1024, 3) + "mb to " + Math.Round(compressedfilessize / 1024, 3) + "mb Saved = " + Math.Round((originalfilessize - compressedfilessize) / 1024, 3) + "mb";
                         listBox1.Items.Add("");
-                        listBox1.Items.Add("Original files size = " + Math.Round(filessize / 1024, 3) + " mb");
-                        listBox1.Items.Add("Compressed files size = " + Math.Round(newfilessize / 1024, 3) + " mb");
-                        listBox1.Items.Add("Saved = " + Math.Round((filessize - newfilessize) / 1024, 3) + " mb");
+                        listBox1.Items.Add("Original files size = " + Math.Round(originalfilessize / 1024, 3) + " mb");
+                        listBox1.Items.Add("Compressed files size = " + Math.Round(compressedfilessize / 1024, 3) + " mb");
+                        listBox1.Items.Add("Saved = " + Math.Round((originalfilessize - compressedfilessize) / 1024, 3) + " mb");
+                        watch.Stop();
+                        TimeSpan ts = watch.Elapsed;
+                        string elapsedTime = String.Format("{0:00}h {1:00}m {2:00}s {3:00}ms", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+                        listBox1.Items.Add("Elapsed time = " + elapsedTime);
                         listBox1.TopIndex = listBox1.Items.Count - 1;
                     }
                     else
@@ -167,16 +190,79 @@ namespace Fallout4_Texture_Compressor
                         MessageBox.Show("No .dds files found.");
                     }
                 }
-                else
-                {
-                    ba2compress();
-                }
+                GC.Collect();
             }
             else
             {
-                MessageBox.Show("You need to set destination folder");
+                MessageBox.Show("You need to set destination folder or BA2 archive");
             }
-            GC.Collect();
+        }
+
+        private Thread startcompressthread(string file, bool ignoresn, int num)
+        {
+            var t = new Thread(() => compressmaster(file, ignoresn, num, true));
+            t.Start();
+            Debug.WriteLine("Thread " + num + " started");
+            return t;
+        }
+
+        private void compressmaster(string file, bool ignoresn, int num, bool isthreaded)
+        {
+            List<string> log = new List<string>();
+            FileInfo fileinf = new FileInfo(file);
+            log.Add(num + ": " + file);
+            if (ignoresn && (fileinf.Name.Contains("_s.dds") || fileinf.Name.Contains("_n.dds") || fileinf.Name.Contains("_g.dds") || fileinf.Name.Contains("_S.dds") || fileinf.Name.Contains("_N.dds") || fileinf.Name.Contains("_G.dds")))
+            {
+                log.Add("Speculars and normals are ignored, skipping");
+            }
+            else
+            {
+                ddsfileinfo ddsinfo = checkdds(file);
+                log.Add("height = " + ddsinfo.height);
+                log.Add("width  = " + ddsinfo.width);
+                log.Add("format = " + ddsinfo.format);
+                log.Add("alpha = " + ddsinfo.alpha.ToString());
+                if (ddsinfo.format.Contains("Unsupported format"))
+                {
+                    log.Add("Unsupported format, skipping");
+                }
+                else
+                {
+                    double filesize = Math.Round((Double)new FileInfo(file).Length / 1024, 1);
+                    originalfilessize += filesize;
+                    log.Add("file size = " + filesize + " kb");
+
+                    //compress
+                    if (compress_check.Checked)
+                    {
+                        string compressed = compress(ddsinfo, file, fileinf);
+                        if (!compressed.Contains("Already compressed")) log.Add("new format = " + compressed);
+                    }
+                    //resize
+                    if (resize_check.Checked)
+                    {
+                        bool resized = resize(ddsinfo, file, fileinf);
+                        if (resized)
+                        {
+                            log.Add("new width  = " + (ddsinfo.width / 2));
+                            log.Add("new height = " + (ddsinfo.height / 2));
+                        }
+                    }
+                    //
+                    double newfilesize = Math.Round((Double)new FileInfo(file).Length / 1024, 1);
+                    compressedfilessize += newfilesize;
+                    if (newfilesize < filesize)
+                    {
+                        log.Add("new file size = " + newfilesize + " kb");
+                    }
+                }
+            }
+            if (!isthreaded) foreach (string entry in log) listBox1.Items.Add(entry);
+            else
+            {
+                foreach (string entry in log) logqueue.Enqueue(entry);
+                if (isthreaded) currentthreads--;
+            }
         }
 
         private void texconv(string arguments)
@@ -192,8 +278,9 @@ namespace Fallout4_Texture_Compressor
             process.WaitForExit();
         }
 
-        private void compress(ddsfileinfo ddsinfo, string file, FileInfo fileinf)
+        private string compress(ddsfileinfo ddsinfo, string file, FileInfo fileinf)
         {
+            string newformat = "Already compressed";
             int ddslvl = 10;
             if (ddsinfo.format.Contains("BC1")) ddslvl = 1;
             else if (ddsinfo.format.Contains("BC2")) ddslvl = 3;
@@ -203,8 +290,7 @@ namespace Fallout4_Texture_Compressor
             else if (ddsinfo.format.Contains("BC7")) ddslvl = 7;
             if (ddslvl == 1)
             {
-                listBox1.Items.Add("Already compressed");
-                return;
+                return newformat;
             }
             if(ddsinfo.alpha == true)
             {
@@ -212,21 +298,21 @@ namespace Fallout4_Texture_Compressor
                 {
                     if (ddsinfo.format.Contains("SRGB"))
                     {
-                        if (compresswithalpha_combo.Text == "BC5")
+                        if (compresswithalpha == "BC5")
                         {
                             texconv("\"" + file + "\" -y -f BC3_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
-                            listBox1.Items.Add("new format = BC3_UNORM_SRGB");
+                            newformat = "BC3_UNORM_SRGB";
                         }
                         else
                         {
-                            texconv("\"" + file + "\" -y -f " + compresswithalpha_combo.Text + "_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
-                            listBox1.Items.Add("new format = " + compresswithalpha_combo.Text + "_UNORM_SRGB");
+                            texconv("\"" + file + "\" -y -f " + compresswithalpha + "_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
+                            newformat = compresswithalpha + "_UNORM_SRGB";
                         }
                     }
                     else
                     {
-                        texconv("\"" + file + "\" -y -f " + compresswithalpha_combo.Text + "_UNORM -o \"" + fileinf.DirectoryName + "\"");
-                        listBox1.Items.Add("new format = " + compresswithalpha_combo.Text + "_UNORM");
+                        texconv("\"" + file + "\" -y -f " + compresswithalpha + "_UNORM -o \"" + fileinf.DirectoryName + "\"");
+                        newformat = compresswithalpha + "_UNORM";
                     }
                 }
             }
@@ -236,45 +322,46 @@ namespace Fallout4_Texture_Compressor
                 {
                     if (ddsinfo.format.Contains("SRGB"))
                     {
-                        if (compressnoalpha_combo.Text == "BC5")
+                        if (compressnoalpha == "BC5")
                         {
                             texconv("\"" + file + "\" -y -f BC3_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
-                            listBox1.Items.Add("new format = BC3_UNORM_SRGB");
+                            newformat = "BC3_UNORM_SRGB";
                         }
                         else
                         {
-                            texconv("\"" + file + "\" -y -f " + compressnoalpha_combo.Text + "_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
-                            listBox1.Items.Add("new format = " + compressnoalpha_combo.Text + "_UNORM_SRGB");
+                            texconv("\"" + file + "\" -y -f " + compressnoalpha + "_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
+                            newformat = compressnoalpha + "_UNORM_SRGB";
                         }
                     }
                     else
                     {
-                        texconv("\"" + file + "\" -y -f " + compressnoalpha_combo.Text + "_UNORM -o \"" + fileinf.DirectoryName + "\"");
-                        listBox1.Items.Add("new format = " + compressnoalpha_combo.Text + "_UNORM");
+                        texconv("\"" + file + "\" -y -f " + compressnoalpha + "_UNORM -o \"" + fileinf.DirectoryName + "\"");
+                        newformat = compressnoalpha + "_UNORM";
                     }
                 }
             }
+            return newformat;
         }
 
-        private void resize(ddsfileinfo ddsinfo, string file, FileInfo fileinf)
+        private bool resize(ddsfileinfo ddsinfo, string file, FileInfo fileinf)
         {
             int size = 0;
             if (ddsinfo.height > ddsinfo.width) { size = ddsinfo.height; } else { size = ddsinfo.width; }
             int ifgreater = 8192;
-            if (texturesize_combo.Text.Contains("256")) { ifgreater = 256; }
-            else if (texturesize_combo.Text.Contains("512")) { ifgreater = 512; }
-            else if (texturesize_combo.Text.Contains("1024")) { ifgreater = 1024; }
-            else if (texturesize_combo.Text.Contains("2048")) { ifgreater = 2048; }
-            else if (texturesize_combo.Text.Contains("4096")) { ifgreater = 4096; }
-            else if (texturesize_combo.Text.Contains("All")) { ifgreater = 4; }
+            if (texturesize.Contains("256")) { ifgreater = 256; }
+            else if (texturesize.Contains("512")) { ifgreater = 512; }
+            else if (texturesize.Contains("1024")) { ifgreater = 1024; }
+            else if (texturesize.Contains("2048")) { ifgreater = 2048; }
+            else if (texturesize.Contains("4096")) { ifgreater = 4096; }
+            else if (texturesize.Contains("All")) { ifgreater = 4; }
             if (size > ifgreater)
             {
                 texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
                 //gen mipmaps
                 texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\"" + " -m 0");
-                listBox1.Items.Add("new  width = " + (ddsinfo.width / 2));
-                listBox1.Items.Add("new height = " + (ddsinfo.height / 2));
+                return true;
             }
+            else return false;
         }
 
         private ddsfileinfo checkdds(string file)
@@ -350,11 +437,8 @@ namespace Fallout4_Texture_Compressor
                 }
             }
             //process.WaitForExit();
-            listBox1.Items.Add("height = " + ddsinfo.height);
-            listBox1.Items.Add("width  = " + ddsinfo.width);
-            listBox1.Items.Add("format = " + ddsinfo.format);
+            //
             ddsinfo.alpha = false;
-
             if (!Directory.Exists(Application.StartupPath + "\\temp")) Directory.CreateDirectory(Application.StartupPath + "\\temp");
             FileInfo fileinf = new FileInfo(file);
             if (ddsinfo.format.Contains("BC3"))
@@ -432,7 +516,6 @@ namespace Fallout4_Texture_Compressor
                 if (blocks6 > 0 && blocks8 > 0) ddsinfo.alpha = true;
                 if (File.Exists(Application.StartupPath + "\\temp\\" + fileinf.Name + "\"")) File.Delete(Application.StartupPath + "\\temp\\" + fileinf.Name + "\"");
             }
-            listBox1.Items.Add("alpha = " + ddsinfo.alpha.ToString());
             return ddsinfo;
         }
 
@@ -461,22 +544,12 @@ namespace Fallout4_Texture_Compressor
                 listBox1.BringToFront();
                 optionsbutton.Visible = true;
                 exportlogbutton.Visible = true;
-                //main
-                if (compressnoalpha_combo.Text.Contains("BC1")) compresslvl = 1;
-                else if (compressnoalpha_combo.Text.Contains("BC3")) compresslvl = 3;
-                else if (compressnoalpha_combo.Text.Contains("BC5")) compresslvl = 5;
-                else if (compressnoalpha_combo.Text.Contains("BC7")) compresslvl = 7;
+                //
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
 
-                if (compresswithalpha_combo.Text.Contains("BC1")) compressalphalvl = 1;
-                else if (compresswithalpha_combo.Text.Contains("BC3")) compressalphalvl = 3;
-                else if (compresswithalpha_combo.Text.Contains("BC5")) compressalphalvl = 5;
-                else if (compresswithalpha_combo.Text.Contains("BC7")) compressalphalvl = 7;
-
-                double filessize = 0;
-                double newfilessize = 0;
                 MainForm form = this;
                 listBox1.Items.Clear();
-                double i = 0;
                 if (backup_check.Checked == true) // backup
                 {
                     form.Text = "Copying BA2 Acthive";
@@ -486,46 +559,42 @@ namespace Fallout4_Texture_Compressor
                 }
 
                 listBox1.Items.Add("Compression:");
-                i = 0;
-                foreach (string file in allfiles)
+                int i = 0;
+                if (threading_check.Checked)
                 {
-                    FileInfo fileinf = new FileInfo(file);
-                    listBox1.Items.Add(i + " : " + file);
-                    if (ignoresn_check.Checked && (fileinf.Name.Contains("_s.dds") || fileinf.Name.Contains("_n.dds") || fileinf.Name.Contains("_g.dds") || fileinf.Name.Contains("_S.dds") || fileinf.Name.Contains("_N.dds") || fileinf.Name.Contains("_G.dds")))
+                    int maxthreads = int.Parse(threads_combo.Text);
+                    if (allfiles.Length < maxthreads) maxthreads = allfiles.Length;
+                    int files = 0;
+                    while (files < allfiles.Length || currentthreads > 0)
                     {
-                        listBox1.Items.Add("Speculars and normals are ignored, skipping");
-                        i++;
-                        form.Text = "Compressing files: " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
+                        if (currentthreads < maxthreads && files < allfiles.Length)
+                        {
+                            startcompressthread(allfiles[files], ignoresn_check.Checked, files + 1);
+                            currentthreads++;
+                            files++;
+                            i++;
+                        }
+                        if (logqueue.Count > 0) if (logqueue.Peek() != null) listBox1.Items.Add(logqueue.Dequeue());
+                        form.Text = "Compressing files: " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%" + " Threads: " + currentthreads;
+                        listBox1.TopIndex = listBox1.Items.Count - 1;
+                        Thread.Sleep(10);
                     }
-                    else
+                    if (logqueue.Count > 0)
                     {
-                        ddsfileinfo ddsinfo = checkdds(file);
-                        if (ddsinfo.format.Contains("Unsupported format"))
-                        {
-                            i++;
-                            form.Text = "Compressing files: " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
-                        }
-                        else
-                        {
-                            i++;
-                            double filesize = Math.Round((Double)new FileInfo(file).Length / 1024, 1);
-                            filessize += filesize;
-                            listBox1.Items.Add("file size = " + filesize + " kb");
-                            //compress
-                            if (compress_check.Checked) compress(ddsinfo, file, fileinf);
-                            //resize
-                            if (resize_check.Checked) resize(ddsinfo, file, fileinf);
-                            //
-                            form.Text = "Compressing files: " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
-                            double newfilesize = Math.Round((Double)new FileInfo(file).Length / 1024, 1);
-                            newfilessize += newfilesize;
-                            if (!listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Already compressed") && !listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Other format compress is unchecked, skipping") && !listBox1.Items[listBox1.Items.Count - 1].ToString().Contains("Safe compress checked, texture has alpha channel, skipping"))
-                            {
-                                listBox1.Items.Add("new file size = " + newfilesize + " kb");
-                            }
-                            //keep listbox scrolled to bottom
-                            listBox1.TopIndex = listBox1.Items.Count - 1;
-                        }
+                        string[] fixqueue = logqueue.ToArray();
+                        logqueue.Clear();
+                        foreach (string entry in fixqueue) listBox1.Items.Add(entry);
+                    }
+                    listBox1.TopIndex = listBox1.Items.Count - 1;
+                }
+                else
+                {
+                    foreach (string file in allfiles)
+                    {
+                        i++;
+                        compressmaster(file, ignoresn_check.Checked, (int)i, false);
+                        form.Text = "Compressing files: " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
+                        listBox1.TopIndex = listBox1.Items.Count - 1;
                     }
                 }
                 if (Directory.Exists(Application.StartupPath + "\\temp")) Directory.Delete(Application.StartupPath + "\\temp", true);
@@ -535,7 +604,7 @@ namespace Fallout4_Texture_Compressor
                 this.EditableArchive.NewArchive();
                 this.SetDirty(false);
                 //addfolders
-                if (filessize > newfilessize)
+                if (originalfilessize > compressedfilessize)
                 {
                     foreach (string folder in Directory.GetDirectories(ba2folder))
                     {
@@ -543,20 +612,25 @@ namespace Fallout4_Texture_Compressor
                     }
                     //save
                     SaveArchive();
+
+                    double newarchivesize = Math.Round((Double)new FileInfo(pathtextbox.Text).Length / 1024 / 1024, 3);
+                    listBox1.Items.Add("");
+                    listBox1.Items.Add("Original Archive size = " + archivesize + " mb");
+                    listBox1.Items.Add("Compressed Archive size = " + newarchivesize + " mb");
+                    listBox1.Items.Add("Saved = " + (archivesize - newarchivesize) + " mb");
+                    watch.Stop();
+                    TimeSpan ts = watch.Elapsed;
+                    string elapsedTime = String.Format("{0:00}h {1:00}m {2:00}s {3:00}ms", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+                    listBox1.Items.Add("Elapsed time = " + elapsedTime);
+                    listBox1.TopIndex = listBox1.Items.Count - 1;
+                    form.Text = "Compressed from " + archivesize + "mb to " + newarchivesize + "mb Saved = " + (archivesize - newarchivesize) + "mb";
                 }
                 else
                 {
                     listBox1.Items.Add("");
                     listBox1.Items.Add("Archive is already compressed");
                 }
-                //
-                double newarchivesize = Math.Round((Double)new FileInfo(pathtextbox.Text).Length / 1024 / 1024, 3);
-                listBox1.Items.Add("");
-                listBox1.Items.Add("Original Archive size = " + archivesize + " mb");
-                listBox1.Items.Add("Compressed Archive size = " + newarchivesize + " mb");
-                listBox1.Items.Add("Saved = " + (archivesize - newarchivesize) + " mb");
-                listBox1.TopIndex = listBox1.Items.Count - 1;
-                form.Text = "Compressed from " + archivesize + "mb to " + newarchivesize + "mb Saved = " + (archivesize - newarchivesize) + "mb";
+                //delete temp files
                 if(Directory.Exists(ba2folder)) Directory.Delete(ba2folder, true);
             }
             else
@@ -742,6 +816,16 @@ namespace Fallout4_Texture_Compressor
         }
 
         private void compressnoalpha_combo_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void threads_combo_KeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void threads_combo_KeyPress(object sender, KeyPressEventArgs e)
         {
             e.Handled = true;
         }

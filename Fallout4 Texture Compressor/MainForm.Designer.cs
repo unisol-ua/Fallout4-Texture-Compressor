@@ -57,6 +57,10 @@
             this.linkLabel2 = new System.Windows.Forms.LinkLabel();
             this.BA2btn = new System.Windows.Forms.Button();
             this.label10 = new System.Windows.Forms.Label();
+            this.threading_check = new System.Windows.Forms.CheckBox();
+            this.threads_combo = new System.Windows.Forms.ComboBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // startbutton
@@ -161,9 +165,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(162, 177);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(228, 13);
+            this.label1.Size = new System.Drawing.Size(231, 13);
             this.label1.TabIndex = 13;
-            this.label1.Text = "Reduces texture dividing by 2 width and height";
+            this.label1.Text = "Reduces texture dividing by 2 width and height ";
             this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // backup_check
@@ -352,7 +356,7 @@
             this.label11.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label11.AutoSize = true;
             this.label11.BackColor = System.Drawing.Color.Transparent;
-            this.label11.Location = new System.Drawing.Point(22, 316);
+            this.label11.Location = new System.Drawing.Point(473, 71);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(185, 52);
             this.label11.TabIndex = 47;
@@ -363,24 +367,26 @@
             // 
             this.linkLabel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(48, 375);
+            this.linkLabel1.BackColor = System.Drawing.Color.Transparent;
+            this.linkLabel1.Location = new System.Drawing.Point(539, 130);
             this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(50, 13);
+            this.linkLabel1.Size = new System.Drawing.Size(28, 13);
             this.linkLabel1.TabIndex = 49;
             this.linkLabel1.TabStop = true;
-            this.linkLabel1.Text = "Source 1";
+            this.linkLabel1.Text = "here";
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
             // linkLabel2
             // 
             this.linkLabel2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.linkLabel2.AutoSize = true;
-            this.linkLabel2.Location = new System.Drawing.Point(108, 375);
+            this.linkLabel2.BackColor = System.Drawing.Color.Transparent;
+            this.linkLabel2.Location = new System.Drawing.Point(590, 130);
             this.linkLabel2.Name = "linkLabel2";
-            this.linkLabel2.Size = new System.Drawing.Size(50, 13);
+            this.linkLabel2.Size = new System.Drawing.Size(28, 13);
             this.linkLabel2.TabIndex = 50;
             this.linkLabel2.TabStop = true;
-            this.linkLabel2.Text = "Source 2";
+            this.linkLabel2.Text = "here";
             this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel2_LinkClicked);
             // 
             // BA2btn
@@ -407,12 +413,70 @@
             this.label10.Text = "Switch between BA2 archives and loose files";
             this.label10.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
+            // threading_check
+            // 
+            this.threading_check.AutoSize = true;
+            this.threading_check.BackColor = System.Drawing.Color.White;
+            this.threading_check.Location = new System.Drawing.Point(25, 302);
+            this.threading_check.Name = "threading_check";
+            this.threading_check.Size = new System.Drawing.Size(92, 17);
+            this.threading_check.TabIndex = 53;
+            this.threading_check.Text = "Multithreading";
+            this.threading_check.UseVisualStyleBackColor = false;
+            // 
+            // threads_combo
+            // 
+            this.threads_combo.BackColor = System.Drawing.Color.White;
+            this.threads_combo.FormattingEnabled = true;
+            this.threads_combo.Items.AddRange(new object[] {
+            "2",
+            "4",
+            "6",
+            "8",
+            "10",
+            "12",
+            "14",
+            "16"});
+            this.threads_combo.Location = new System.Drawing.Point(25, 325);
+            this.threads_combo.Name = "threads_combo";
+            this.threads_combo.Size = new System.Drawing.Size(121, 21);
+            this.threads_combo.TabIndex = 54;
+            this.threads_combo.Text = "4";
+            this.threads_combo.KeyDown += new System.Windows.Forms.KeyEventHandler(this.threads_combo_KeyDown);
+            this.threads_combo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.threads_combo_KeyPress);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.BackColor = System.Drawing.Color.Transparent;
+            this.label7.Location = new System.Drawing.Point(480, 130);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(60, 13);
+            this.label7.TabIndex = 55;
+            this.label7.Text = "Learn more";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.BackColor = System.Drawing.Color.Transparent;
+            this.label12.Location = new System.Drawing.Point(565, 130);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(25, 13);
+            this.label12.TabIndex = 56;
+            this.label12.Text = "and";
+            this.label12.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(680, 444);
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.threads_combo);
+            this.Controls.Add(this.threading_check);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.BA2btn);
             this.Controls.Add(this.linkLabel2);
@@ -481,6 +545,10 @@
         private System.Windows.Forms.LinkLabel linkLabel2;
         private System.Windows.Forms.Button BA2btn;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.CheckBox threading_check;
+        private System.Windows.Forms.ComboBox threads_combo;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label12;
     }
 }
 
