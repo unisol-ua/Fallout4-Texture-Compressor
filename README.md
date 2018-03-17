@@ -1,4 +1,4 @@
-# Fallout4 Texture Compressor
+# Fallout 4 Texture Compressor
 Compress and resize Fallout 4 textures
 
 # Download
