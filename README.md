@@ -1,4 +1,4 @@
-# Fallout4-Texture-Compressor
+# Fallout 4 Texture Compressor
 Compress and resize Fallout 4 textures
 
 # Download
@@ -16,4 +16,4 @@ Create /bin/ directory and put them there.
 Note: this only needed for manual build, all files are included in release section
 
 # Preview
-![settings](https://i.imgur.com/QEjg52x.png)
+![settings](https://i.imgur.com/yiw9twe.png)
