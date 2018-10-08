@@ -61,6 +61,10 @@
             this.threads_combo = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
+            this.ignorediffuse_check = new System.Windows.Forms.CheckBox();
+            this.ignoreface_check = new System.Windows.Forms.CheckBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // startbutton
@@ -70,7 +74,7 @@
             this.startbutton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightCyan;
             this.startbutton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Azure;
             this.startbutton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.startbutton.Location = new System.Drawing.Point(306, 413);
+            this.startbutton.Location = new System.Drawing.Point(306, 417);
             this.startbutton.Name = "startbutton";
             this.startbutton.Size = new System.Drawing.Size(75, 23);
             this.startbutton.TabIndex = 0;
@@ -87,7 +91,7 @@
             this.listBox1.FormattingEnabled = true;
             this.listBox1.Location = new System.Drawing.Point(12, 41);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(656, 355);
+            this.listBox1.Size = new System.Drawing.Size(656, 368);
             this.listBox1.TabIndex = 1;
             this.listBox1.Visible = false;
             this.listBox1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listBox1_MouseDoubleClick);
@@ -141,7 +145,7 @@
             "if > 1024",
             "if > 2048",
             "if > 4096"});
-            this.texturesize_combo.Location = new System.Drawing.Point(25, 199);
+            this.texturesize_combo.Location = new System.Drawing.Point(25, 245);
             this.texturesize_combo.Name = "texturesize_combo";
             this.texturesize_combo.Size = new System.Drawing.Size(121, 21);
             this.texturesize_combo.TabIndex = 10;
@@ -153,7 +157,7 @@
             // 
             this.resize_check.AutoSize = true;
             this.resize_check.BackColor = System.Drawing.Color.White;
-            this.resize_check.Location = new System.Drawing.Point(25, 176);
+            this.resize_check.Location = new System.Drawing.Point(25, 222);
             this.resize_check.Name = "resize_check";
             this.resize_check.Size = new System.Drawing.Size(87, 17);
             this.resize_check.TabIndex = 12;
@@ -163,7 +167,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(162, 177);
+            this.label1.Location = new System.Drawing.Point(162, 223);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(231, 13);
             this.label1.TabIndex = 13;
@@ -176,7 +180,7 @@
             this.backup_check.BackColor = System.Drawing.Color.White;
             this.backup_check.Checked = true;
             this.backup_check.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.backup_check.Location = new System.Drawing.Point(25, 231);
+            this.backup_check.Location = new System.Drawing.Point(25, 277);
             this.backup_check.Name = "backup_check";
             this.backup_check.Size = new System.Drawing.Size(93, 17);
             this.backup_check.TabIndex = 14;
@@ -186,7 +190,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(162, 202);
+            this.label2.Location = new System.Drawing.Point(162, 248);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(183, 13);
             this.label2.TabIndex = 15;
@@ -204,7 +208,7 @@
             // backupname
             // 
             this.backupname.BackColor = System.Drawing.Color.White;
-            this.backupname.Location = new System.Drawing.Point(25, 254);
+            this.backupname.Location = new System.Drawing.Point(25, 300);
             this.backupname.Name = "backupname";
             this.backupname.Size = new System.Drawing.Size(121, 20);
             this.backupname.TabIndex = 17;
@@ -212,7 +216,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(162, 257);
+            this.label4.Location = new System.Drawing.Point(162, 303);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(265, 13);
             this.label4.TabIndex = 18;
@@ -226,7 +230,7 @@
             this.exportlogbutton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightCyan;
             this.exportlogbutton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Azure;
             this.exportlogbutton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.exportlogbutton.Location = new System.Drawing.Point(593, 413);
+            this.exportlogbutton.Location = new System.Drawing.Point(593, 417);
             this.exportlogbutton.Name = "exportlogbutton";
             this.exportlogbutton.Size = new System.Drawing.Size(75, 23);
             this.exportlogbutton.TabIndex = 19;
@@ -242,7 +246,7 @@
             this.aboutbutton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightCyan;
             this.aboutbutton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Azure;
             this.aboutbutton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.aboutbutton.Location = new System.Drawing.Point(12, 413);
+            this.aboutbutton.Location = new System.Drawing.Point(12, 417);
             this.aboutbutton.Name = "aboutbutton";
             this.aboutbutton.Size = new System.Drawing.Size(75, 23);
             this.aboutbutton.TabIndex = 20;
@@ -263,7 +267,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(22, 277);
+            this.label8.Location = new System.Drawing.Point(22, 323);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(234, 13);
             this.label8.TabIndex = 26;
@@ -274,7 +278,7 @@
             // 
             this.ignoresn_check.AutoSize = true;
             this.ignoresn_check.BackColor = System.Drawing.Color.White;
-            this.ignoresn_check.Location = new System.Drawing.Point(25, 153);
+            this.ignoresn_check.Location = new System.Drawing.Point(25, 176);
             this.ignoresn_check.Name = "ignoresn_check";
             this.ignoresn_check.Size = new System.Drawing.Size(124, 17);
             this.ignoresn_check.TabIndex = 27;
@@ -284,11 +288,11 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(162, 154);
+            this.label9.Location = new System.Drawing.Point(162, 177);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(251, 13);
+            this.label9.Size = new System.Drawing.Size(188, 13);
             this.label9.TabIndex = 28;
-            this.label9.Text = "Completely ignore speculars, normals and glowmaps";
+            this.label9.Text = "Ignore specular, normal and glowmaps";
             this.label9.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // optionsbutton
@@ -298,7 +302,7 @@
             this.optionsbutton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightCyan;
             this.optionsbutton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Azure;
             this.optionsbutton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.optionsbutton.Location = new System.Drawing.Point(512, 413);
+            this.optionsbutton.Location = new System.Drawing.Point(512, 417);
             this.optionsbutton.Name = "optionsbutton";
             this.optionsbutton.Size = new System.Drawing.Size(75, 23);
             this.optionsbutton.TabIndex = 29;
@@ -353,10 +357,9 @@
             // 
             // label11
             // 
-            this.label11.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label11.AutoSize = true;
             this.label11.BackColor = System.Drawing.Color.Transparent;
-            this.label11.Location = new System.Drawing.Point(473, 71);
+            this.label11.Location = new System.Drawing.Point(473, 75);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(185, 52);
             this.label11.TabIndex = 47;
@@ -365,7 +368,6 @@
             // 
             // linkLabel1
             // 
-            this.linkLabel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.linkLabel1.AutoSize = true;
             this.linkLabel1.BackColor = System.Drawing.Color.Transparent;
             this.linkLabel1.Location = new System.Drawing.Point(539, 130);
@@ -378,7 +380,6 @@
             // 
             // linkLabel2
             // 
-            this.linkLabel2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.linkLabel2.AutoSize = true;
             this.linkLabel2.BackColor = System.Drawing.Color.Transparent;
             this.linkLabel2.Location = new System.Drawing.Point(590, 130);
@@ -399,7 +400,7 @@
             this.BA2btn.Name = "BA2btn";
             this.BA2btn.Size = new System.Drawing.Size(75, 23);
             this.BA2btn.TabIndex = 51;
-            this.BA2btn.Text = "BA2";
+            this.BA2btn.Text = "Loose";
             this.BA2btn.UseVisualStyleBackColor = true;
             this.BA2btn.Click += new System.EventHandler(this.BA2btn_Click);
             // 
@@ -417,7 +418,7 @@
             // 
             this.threading_check.AutoSize = true;
             this.threading_check.BackColor = System.Drawing.Color.White;
-            this.threading_check.Location = new System.Drawing.Point(25, 302);
+            this.threading_check.Location = new System.Drawing.Point(25, 348);
             this.threading_check.Name = "threading_check";
             this.threading_check.Size = new System.Drawing.Size(92, 17);
             this.threading_check.TabIndex = 53;
@@ -437,7 +438,7 @@
             "12",
             "14",
             "16"});
-            this.threads_combo.Location = new System.Drawing.Point(25, 325);
+            this.threads_combo.Location = new System.Drawing.Point(25, 371);
             this.threads_combo.Name = "threads_combo";
             this.threads_combo.Size = new System.Drawing.Size(121, 21);
             this.threads_combo.TabIndex = 54;
@@ -467,12 +468,60 @@
             this.label12.Text = "and";
             this.label12.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
+            // ignorediffuse_check
+            // 
+            this.ignorediffuse_check.AutoSize = true;
+            this.ignorediffuse_check.BackColor = System.Drawing.Color.White;
+            this.ignorediffuse_check.Location = new System.Drawing.Point(25, 199);
+            this.ignorediffuse_check.Name = "ignorediffuse_check";
+            this.ignorediffuse_check.Size = new System.Drawing.Size(90, 17);
+            this.ignorediffuse_check.TabIndex = 57;
+            this.ignorediffuse_check.Text = "Ignore diffuse";
+            this.ignorediffuse_check.UseVisualStyleBackColor = false;
+            // 
+            // ignoreface_check
+            // 
+            this.ignoreface_check.AutoSize = true;
+            this.ignoreface_check.BackColor = System.Drawing.Color.White;
+            this.ignoreface_check.Checked = true;
+            this.ignoreface_check.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ignoreface_check.Location = new System.Drawing.Point(25, 153);
+            this.ignoreface_check.Name = "ignoreface_check";
+            this.ignoreface_check.Size = new System.Drawing.Size(120, 17);
+            this.ignoreface_check.TabIndex = 58;
+            this.ignoreface_check.Text = "Ignore face textures";
+            this.ignoreface_check.UseVisualStyleBackColor = false;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(162, 200);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(289, 13);
+            this.label13.TabIndex = 59;
+            this.label13.Text = "Ignore diffuse maps, only _s, _n, _g maps will be compresed\r\n";
+            this.label13.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(162, 154);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(232, 13);
+            this.label14.TabIndex = 60;
+            this.label14.Text = "Compressing face textures breaks them in game";
+            this.label14.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(680, 444);
+            this.ClientSize = new System.Drawing.Size(680, 448);
+            this.Controls.Add(this.label14);
+            this.Controls.Add(this.label13);
+            this.Controls.Add(this.ignoreface_check);
+            this.Controls.Add(this.ignorediffuse_check);
             this.Controls.Add(this.label12);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.threads_combo);
@@ -549,6 +598,10 @@
         private System.Windows.Forms.ComboBox threads_combo;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.CheckBox ignorediffuse_check;
+        private System.Windows.Forms.CheckBox ignoreface_check;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label14;
     }
 }
 

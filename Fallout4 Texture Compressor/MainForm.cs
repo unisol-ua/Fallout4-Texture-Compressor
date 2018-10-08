@@ -145,7 +145,7 @@ namespace Fallout4_Texture_Compressor
                             {
                                 if(currentthreads < maxthreads && files < allfiles.Length)
                                 {
-                                    startcompressthread(allfiles[files], ignoresn_check.Checked, files+1);
+                                    startcompressthread(allfiles[files], ignoresn_check.Checked, ignoreface_check.Checked, ignorediffuse_check.Checked, files+1);
                                     currentthreads++;
                                     files++;
                                     i++;
@@ -168,7 +168,7 @@ namespace Fallout4_Texture_Compressor
                             foreach (string file in allfiles)
                             {
                                 i++;
-                                compressmaster(file, ignoresn_check.Checked, (int)i, false);
+                                compressmaster(file, ignoresn_check.Checked, ignoreface_check.Checked, ignorediffuse_check.Checked, (int)i, false);
                                 form.Text = "Compressing files: " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
                                 listBox1.TopIndex = listBox1.Items.Count - 1;
                             }
@@ -198,22 +198,30 @@ namespace Fallout4_Texture_Compressor
             }
         }
 
-        private Thread startcompressthread(string file, bool ignoresn, int num)
+        private Thread startcompressthread(string file, bool ignoresn, bool ignoreface, bool ignorediffuse, int num)
         {
-            var t = new Thread(() => compressmaster(file, ignoresn, num, true));
+            var t = new Thread(() => compressmaster(file, ignoresn, ignoreface, ignorediffuse, num, true));
             t.Start();
             Debug.WriteLine("Thread " + num + " started");
             return t;
         }
 
-        private void compressmaster(string file, bool ignoresn, int num, bool isthreaded)
+        private void compressmaster(string file, bool ignoresn, bool ignoreface, bool ignorediffuse, int num, bool isthreaded)
         {
             List<string> log = new List<string>();
             FileInfo fileinf = new FileInfo(file);
             log.Add(num + ": " + file);
             if (ignoresn && (fileinf.Name.Contains("_s.dds") || fileinf.Name.Contains("_n.dds") || fileinf.Name.Contains("_g.dds") || fileinf.Name.Contains("_S.dds") || fileinf.Name.Contains("_N.dds") || fileinf.Name.Contains("_G.dds")))
             {
-                log.Add("Speculars and normals are ignored, skipping");
+                log.Add("Specular, normal and glowmaps are ignored, skipping");
+            }
+            else if (ignoreface && (fileinf.Name.Contains("femalehead") || fileinf.Name.Contains("malehead")))
+            {
+                log.Add("Face textures are ignored, skipping");
+            }
+            else if (ignorediffuse && !(fileinf.Name.Contains("_s.dds") || fileinf.Name.Contains("_n.dds") || fileinf.Name.Contains("_g.dds") || fileinf.Name.Contains("_S.dds") || fileinf.Name.Contains("_N.dds") || fileinf.Name.Contains("_G.dds")))
+            {
+                log.Add("Diffuse textures are ignored, skipping");
             }
             else
             {
@@ -569,7 +577,7 @@ namespace Fallout4_Texture_Compressor
                     {
                         if (currentthreads < maxthreads && files < allfiles.Length)
                         {
-                            startcompressthread(allfiles[files], ignoresn_check.Checked, files + 1);
+                            startcompressthread(allfiles[files], ignoresn_check.Checked, ignoreface_check.Checked, ignorediffuse_check.Checked, files + 1);
                             currentthreads++;
                             files++;
                             i++;
@@ -592,7 +600,7 @@ namespace Fallout4_Texture_Compressor
                     foreach (string file in allfiles)
                     {
                         i++;
-                        compressmaster(file, ignoresn_check.Checked, (int)i, false);
+                        compressmaster(file, ignoresn_check.Checked, ignoreface_check.Checked, ignorediffuse_check.Checked, (int)i, false);
                         form.Text = "Compressing files: " + i + " of " + allfiles.Length + " : " + Math.Round(i / ((Double)allfiles.Length / 100), 2) + "%";
                         listBox1.TopIndex = listBox1.Items.Count - 1;
                     }
@@ -753,12 +761,12 @@ namespace Fallout4_Texture_Compressor
             if (ba2)
             {
                 ba2 = false;
-                BA2btn.Text = "BA2";
+                BA2btn.Text = "Loose";
             }
             else
             {
                 ba2 = true;
-                BA2btn.Text = "Loose";
+                BA2btn.Text = "BA2";
             }
         }
 

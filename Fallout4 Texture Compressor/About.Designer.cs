@@ -107,10 +107,10 @@
             this.linkLabel3.AutoSize = true;
             this.linkLabel3.Location = new System.Drawing.Point(53, 105);
             this.linkLabel3.Name = "linkLabel3";
-            this.linkLabel3.Size = new System.Drawing.Size(230, 13);
+            this.linkLabel3.Size = new System.Drawing.Size(191, 13);
             this.linkLabel3.TabIndex = 29;
             this.linkLabel3.TabStop = true;
-            this.linkLabel3.Text = "http://steamcommunity.com/id/admirativ_com/";
+            this.linkLabel3.Text = "https://steamcommunity.com/id/iiadm/";
             this.linkLabel3.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel3_LinkClicked);
             // 
             // label4
