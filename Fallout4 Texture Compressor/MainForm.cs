@@ -197,7 +197,7 @@ namespace Fallout4_Texture_Compressor
             }
             else
             {
-                MessageBox.Show("No .dds files found.");
+                MessageBox.Show("No .dds files were found in the folder.");
             }
         }
 
