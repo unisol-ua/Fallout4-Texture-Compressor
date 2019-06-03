@@ -480,6 +480,13 @@
             this.force_compression_check.UseVisualStyleBackColor = false;
             this.force_compression_check.MouseHover += new System.EventHandler(this.force_compression_check_MouseHover);
             // 
+            // toolTip1
+            // 
+            this.toolTip1.AutomaticDelay = 200;
+            this.toolTip1.AutoPopDelay = 30000;
+            this.toolTip1.InitialDelay = 200;
+            this.toolTip1.ReshowDelay = 40;
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
