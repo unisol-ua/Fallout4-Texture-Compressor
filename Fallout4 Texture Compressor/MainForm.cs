@@ -143,7 +143,7 @@ namespace Fallout4_Texture_Compressor
 
                         //Log some stuff and show progress
                         if (logqueue.Count > 0) if (logqueue.Peek() != null) listBox1.Items.Add(logqueue.Dequeue());
-                        form.Text = "Processig files: " + i + " of " + allfiles.Length + " |  Running Threads: " + currentthreads;
+                        form.Text = "Processing files: " + i + " of " + allfiles.Length + " |  Running Threads: " + currentthreads;
                         listBox1.TopIndex = listBox1.Items.Count - 1;
 
                         //Get some rest
@@ -708,7 +708,7 @@ namespace Fallout4_Texture_Compressor
 
                         //Log some stuff and show progress
                         if (logqueue.Count > 0) if (logqueue.Peek() != null) listBox1.Items.Add(logqueue.Dequeue());
-                        form.Text = "Processig files: " + i + " of " + allfiles.Length + " :  Running Threads: " + currentthreads;
+                        form.Text = "Processing files: " + i + " of " + allfiles.Length + " :  Running Threads: " + currentthreads;
                         listBox1.TopIndex = listBox1.Items.Count - 1;
 
                         //Get some rest
