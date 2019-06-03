@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.startbutton = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.listBox1 = new System.Windows.Forms.ListBox();
@@ -36,9 +37,7 @@
             this.compress_check = new System.Windows.Forms.CheckBox();
             this.texturesize_combo = new System.Windows.Forms.ComboBox();
             this.resize_check = new System.Windows.Forms.CheckBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.backup_check = new System.Windows.Forms.CheckBox();
-            this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.backupname = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -46,11 +45,10 @@
             this.aboutbutton = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
-            this.ignoresn_check = new System.Windows.Forms.CheckBox();
-            this.label9 = new System.Windows.Forms.Label();
+            this.ignore_sng_maps_check = new System.Windows.Forms.CheckBox();
             this.optionsbutton = new System.Windows.Forms.Button();
-            this.compresswithalpha_combo = new System.Windows.Forms.ComboBox();
-            this.compressnoalpha_combo = new System.Windows.Forms.ComboBox();
+            this.compress_lvl_alpha_string_combo = new System.Windows.Forms.ComboBox();
+            this.compress_lvl_string_combo = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
@@ -61,10 +59,11 @@
             this.threads_combo = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
-            this.ignorediffuse_check = new System.Windows.Forms.CheckBox();
-            this.ignoreface_check = new System.Windows.Forms.CheckBox();
-            this.label13 = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
+            this.ignore_diffuse_check = new System.Windows.Forms.CheckBox();
+            this.ignore_face_check = new System.Windows.Forms.CheckBox();
+            this.force_compression_check = new System.Windows.Forms.CheckBox();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // startbutton
@@ -74,7 +73,7 @@
             this.startbutton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightCyan;
             this.startbutton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Azure;
             this.startbutton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.startbutton.Location = new System.Drawing.Point(306, 417);
+            this.startbutton.Location = new System.Drawing.Point(306, 446);
             this.startbutton.Name = "startbutton";
             this.startbutton.Size = new System.Drawing.Size(75, 23);
             this.startbutton.TabIndex = 0;
@@ -91,7 +90,7 @@
             this.listBox1.FormattingEnabled = true;
             this.listBox1.Location = new System.Drawing.Point(12, 41);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(656, 368);
+            this.listBox1.Size = new System.Drawing.Size(656, 394);
             this.listBox1.TabIndex = 1;
             this.listBox1.Visible = false;
             this.listBox1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listBox1_MouseDoubleClick);
@@ -145,7 +144,7 @@
             "if > 1024",
             "if > 2048",
             "if > 4096"});
-            this.texturesize_combo.Location = new System.Drawing.Point(25, 245);
+            this.texturesize_combo.Location = new System.Drawing.Point(25, 269);
             this.texturesize_combo.Name = "texturesize_combo";
             this.texturesize_combo.Size = new System.Drawing.Size(121, 21);
             this.texturesize_combo.TabIndex = 10;
@@ -157,22 +156,13 @@
             // 
             this.resize_check.AutoSize = true;
             this.resize_check.BackColor = System.Drawing.Color.White;
-            this.resize_check.Location = new System.Drawing.Point(25, 222);
+            this.resize_check.Location = new System.Drawing.Point(25, 246);
             this.resize_check.Name = "resize_check";
-            this.resize_check.Size = new System.Drawing.Size(87, 17);
+            this.resize_check.Size = new System.Drawing.Size(127, 17);
             this.resize_check.TabIndex = 12;
-            this.resize_check.Text = "Resize down";
+            this.resize_check.Text = "Resize textures down";
             this.resize_check.UseVisualStyleBackColor = false;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(162, 223);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(231, 13);
-            this.label1.TabIndex = 13;
-            this.label1.Text = "Reduces texture dividing by 2 width and height ";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.resize_check.MouseHover += new System.EventHandler(this.resize_check_MouseHover);
             // 
             // backup_check
             // 
@@ -180,22 +170,13 @@
             this.backup_check.BackColor = System.Drawing.Color.White;
             this.backup_check.Checked = true;
             this.backup_check.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.backup_check.Location = new System.Drawing.Point(25, 277);
+            this.backup_check.Location = new System.Drawing.Point(25, 301);
             this.backup_check.Name = "backup_check";
             this.backup_check.Size = new System.Drawing.Size(93, 17);
             this.backup_check.TabIndex = 14;
             this.backup_check.Text = "Make Backup";
             this.backup_check.UseVisualStyleBackColor = false;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(162, 248);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(183, 13);
-            this.label2.TabIndex = 15;
-            this.label2.Text = "Compared to the biggest of those two";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.backup_check.MouseHover += new System.EventHandler(this.backup_check_MouseHover);
             // 
             // label3
             // 
@@ -208,7 +189,7 @@
             // backupname
             // 
             this.backupname.BackColor = System.Drawing.Color.White;
-            this.backupname.Location = new System.Drawing.Point(25, 300);
+            this.backupname.Location = new System.Drawing.Point(25, 324);
             this.backupname.Name = "backupname";
             this.backupname.Size = new System.Drawing.Size(121, 20);
             this.backupname.TabIndex = 17;
@@ -216,7 +197,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(162, 303);
+            this.label4.Location = new System.Drawing.Point(162, 327);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(265, 13);
             this.label4.TabIndex = 18;
@@ -230,7 +211,7 @@
             this.exportlogbutton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightCyan;
             this.exportlogbutton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Azure;
             this.exportlogbutton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.exportlogbutton.Location = new System.Drawing.Point(593, 417);
+            this.exportlogbutton.Location = new System.Drawing.Point(593, 446);
             this.exportlogbutton.Name = "exportlogbutton";
             this.exportlogbutton.Size = new System.Drawing.Size(75, 23);
             this.exportlogbutton.TabIndex = 19;
@@ -246,7 +227,7 @@
             this.aboutbutton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightCyan;
             this.aboutbutton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Azure;
             this.aboutbutton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.aboutbutton.Location = new System.Drawing.Point(12, 417);
+            this.aboutbutton.Location = new System.Drawing.Point(12, 446);
             this.aboutbutton.Name = "aboutbutton";
             this.aboutbutton.Size = new System.Drawing.Size(75, 23);
             this.aboutbutton.TabIndex = 20;
@@ -267,33 +248,24 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(22, 323);
+            this.label8.Location = new System.Drawing.Point(22, 347);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(234, 13);
             this.label8.TabIndex = 26;
             this.label8.Text = "Don\'t use special characters like / \\ | : * ? < > \" \'";
             this.label8.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
-            // ignoresn_check
+            // ignore_sng_maps_check
             // 
-            this.ignoresn_check.AutoSize = true;
-            this.ignoresn_check.BackColor = System.Drawing.Color.White;
-            this.ignoresn_check.Location = new System.Drawing.Point(25, 176);
-            this.ignoresn_check.Name = "ignoresn_check";
-            this.ignoresn_check.Size = new System.Drawing.Size(124, 17);
-            this.ignoresn_check.TabIndex = 27;
-            this.ignoresn_check.Text = "Ignore _s, _n and _g";
-            this.ignoresn_check.UseVisualStyleBackColor = false;
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(162, 177);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(188, 13);
-            this.label9.TabIndex = 28;
-            this.label9.Text = "Ignore specular, normal and glowmaps";
-            this.label9.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.ignore_sng_maps_check.AutoSize = true;
+            this.ignore_sng_maps_check.BackColor = System.Drawing.Color.White;
+            this.ignore_sng_maps_check.Location = new System.Drawing.Point(25, 200);
+            this.ignore_sng_maps_check.Name = "ignore_sng_maps_check";
+            this.ignore_sng_maps_check.Size = new System.Drawing.Size(207, 17);
+            this.ignore_sng_maps_check.TabIndex = 27;
+            this.ignore_sng_maps_check.Text = "Ignore specular, normal and glowmaps";
+            this.ignore_sng_maps_check.UseVisualStyleBackColor = false;
+            this.ignore_sng_maps_check.MouseHover += new System.EventHandler(this.ignore_sng_maps_check_MouseHover);
             // 
             // optionsbutton
             // 
@@ -302,7 +274,7 @@
             this.optionsbutton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightCyan;
             this.optionsbutton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Azure;
             this.optionsbutton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.optionsbutton.Location = new System.Drawing.Point(512, 417);
+            this.optionsbutton.Location = new System.Drawing.Point(512, 446);
             this.optionsbutton.Name = "optionsbutton";
             this.optionsbutton.Size = new System.Drawing.Size(75, 23);
             this.optionsbutton.TabIndex = 29;
@@ -311,39 +283,39 @@
             this.optionsbutton.Visible = false;
             this.optionsbutton.Click += new System.EventHandler(this.optionsbutton_Click);
             // 
-            // compresswithalpha_combo
+            // compress_lvl_alpha_string_combo
             // 
-            this.compresswithalpha_combo.BackColor = System.Drawing.Color.White;
-            this.compresswithalpha_combo.FormattingEnabled = true;
-            this.compresswithalpha_combo.Items.AddRange(new object[] {
+            this.compress_lvl_alpha_string_combo.BackColor = System.Drawing.Color.White;
+            this.compress_lvl_alpha_string_combo.FormattingEnabled = true;
+            this.compress_lvl_alpha_string_combo.Items.AddRange(new object[] {
             "BC7",
             "BC5",
             "BC3",
             "BC1"});
-            this.compresswithalpha_combo.Location = new System.Drawing.Point(25, 117);
-            this.compresswithalpha_combo.Name = "compresswithalpha_combo";
-            this.compresswithalpha_combo.Size = new System.Drawing.Size(121, 21);
-            this.compresswithalpha_combo.TabIndex = 44;
-            this.compresswithalpha_combo.Text = "BC3";
-            this.compresswithalpha_combo.KeyDown += new System.Windows.Forms.KeyEventHandler(this.compressother_combo_KeyDown);
-            this.compresswithalpha_combo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.compressother_combo_KeyPress);
+            this.compress_lvl_alpha_string_combo.Location = new System.Drawing.Point(25, 117);
+            this.compress_lvl_alpha_string_combo.Name = "compress_lvl_alpha_string_combo";
+            this.compress_lvl_alpha_string_combo.Size = new System.Drawing.Size(121, 21);
+            this.compress_lvl_alpha_string_combo.TabIndex = 44;
+            this.compress_lvl_alpha_string_combo.Text = "BC3";
+            this.compress_lvl_alpha_string_combo.KeyDown += new System.Windows.Forms.KeyEventHandler(this.compress_lvl_alpha_string_combo_KeyDown);
+            this.compress_lvl_alpha_string_combo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.compress_lvl_alpha_string_combo_KeyPress);
             // 
-            // compressnoalpha_combo
+            // compress_lvl_string_combo
             // 
-            this.compressnoalpha_combo.BackColor = System.Drawing.Color.White;
-            this.compressnoalpha_combo.FormattingEnabled = true;
-            this.compressnoalpha_combo.Items.AddRange(new object[] {
+            this.compress_lvl_string_combo.BackColor = System.Drawing.Color.White;
+            this.compress_lvl_string_combo.FormattingEnabled = true;
+            this.compress_lvl_string_combo.Items.AddRange(new object[] {
             "BC7",
             "BC5",
             "BC3",
             "BC1"});
-            this.compressnoalpha_combo.Location = new System.Drawing.Point(25, 94);
-            this.compressnoalpha_combo.Name = "compressnoalpha_combo";
-            this.compressnoalpha_combo.Size = new System.Drawing.Size(121, 21);
-            this.compressnoalpha_combo.TabIndex = 45;
-            this.compressnoalpha_combo.Text = "BC1";
-            this.compressnoalpha_combo.KeyDown += new System.Windows.Forms.KeyEventHandler(this.compressnoalpha_combo_KeyDown);
-            this.compressnoalpha_combo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.compressnoalpha_combo_KeyPress);
+            this.compress_lvl_string_combo.Location = new System.Drawing.Point(25, 94);
+            this.compress_lvl_string_combo.Name = "compress_lvl_string_combo";
+            this.compress_lvl_string_combo.Size = new System.Drawing.Size(121, 21);
+            this.compress_lvl_string_combo.TabIndex = 45;
+            this.compress_lvl_string_combo.Text = "BC1";
+            this.compress_lvl_string_combo.KeyDown += new System.Windows.Forms.KeyEventHandler(this.compress_lvl_string_combo_KeyDown);
+            this.compress_lvl_string_combo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.compress_lvl_string_combo_KeyPress);
             // 
             // label6
             // 
@@ -409,21 +381,22 @@
             this.label10.AutoSize = true;
             this.label10.Location = new System.Drawing.Point(94, 47);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(219, 13);
+            this.label10.Size = new System.Drawing.Size(230, 13);
             this.label10.TabIndex = 52;
-            this.label10.Text = "Switch between BA2 archives and loose files";
+            this.label10.Text = "Choose to compress loose files or BA2 archives";
             this.label10.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // threading_check
             // 
             this.threading_check.AutoSize = true;
             this.threading_check.BackColor = System.Drawing.Color.White;
-            this.threading_check.Location = new System.Drawing.Point(25, 348);
+            this.threading_check.Location = new System.Drawing.Point(25, 372);
             this.threading_check.Name = "threading_check";
             this.threading_check.Size = new System.Drawing.Size(92, 17);
             this.threading_check.TabIndex = 53;
             this.threading_check.Text = "Multithreading";
             this.threading_check.UseVisualStyleBackColor = false;
+            this.threading_check.MouseHover += new System.EventHandler(this.threading_check_MouseHover);
             // 
             // threads_combo
             // 
@@ -438,7 +411,7 @@
             "12",
             "14",
             "16"});
-            this.threads_combo.Location = new System.Drawing.Point(25, 371);
+            this.threads_combo.Location = new System.Drawing.Point(25, 395);
             this.threads_combo.Name = "threads_combo";
             this.threads_combo.Size = new System.Drawing.Size(121, 21);
             this.threads_combo.TabIndex = 54;
@@ -468,60 +441,65 @@
             this.label12.Text = "and";
             this.label12.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
-            // ignorediffuse_check
+            // ignore_diffuse_check
             // 
-            this.ignorediffuse_check.AutoSize = true;
-            this.ignorediffuse_check.BackColor = System.Drawing.Color.White;
-            this.ignorediffuse_check.Location = new System.Drawing.Point(25, 199);
-            this.ignorediffuse_check.Name = "ignorediffuse_check";
-            this.ignorediffuse_check.Size = new System.Drawing.Size(90, 17);
-            this.ignorediffuse_check.TabIndex = 57;
-            this.ignorediffuse_check.Text = "Ignore diffuse";
-            this.ignorediffuse_check.UseVisualStyleBackColor = false;
+            this.ignore_diffuse_check.AutoSize = true;
+            this.ignore_diffuse_check.BackColor = System.Drawing.Color.White;
+            this.ignore_diffuse_check.Location = new System.Drawing.Point(25, 223);
+            this.ignore_diffuse_check.Name = "ignore_diffuse_check";
+            this.ignore_diffuse_check.Size = new System.Drawing.Size(130, 17);
+            this.ignore_diffuse_check.TabIndex = 57;
+            this.ignore_diffuse_check.Text = "Ignore diffuse textures";
+            this.ignore_diffuse_check.UseVisualStyleBackColor = false;
+            this.ignore_diffuse_check.MouseHover += new System.EventHandler(this.ignore_diffuse_check_MouseHover);
             // 
-            // ignoreface_check
+            // ignore_face_check
             // 
-            this.ignoreface_check.AutoSize = true;
-            this.ignoreface_check.BackColor = System.Drawing.Color.White;
-            this.ignoreface_check.Checked = true;
-            this.ignoreface_check.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ignoreface_check.Location = new System.Drawing.Point(25, 153);
-            this.ignoreface_check.Name = "ignoreface_check";
-            this.ignoreface_check.Size = new System.Drawing.Size(120, 17);
-            this.ignoreface_check.TabIndex = 58;
-            this.ignoreface_check.Text = "Ignore face textures";
-            this.ignoreface_check.UseVisualStyleBackColor = false;
+            this.ignore_face_check.AutoSize = true;
+            this.ignore_face_check.BackColor = System.Drawing.Color.White;
+            this.ignore_face_check.Checked = true;
+            this.ignore_face_check.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ignore_face_check.Enabled = false;
+            this.ignore_face_check.Location = new System.Drawing.Point(25, 177);
+            this.ignore_face_check.Name = "ignore_face_check";
+            this.ignore_face_check.Size = new System.Drawing.Size(120, 17);
+            this.ignore_face_check.TabIndex = 58;
+            this.ignore_face_check.Text = "Ignore face textures";
+            this.ignore_face_check.UseVisualStyleBackColor = false;
+            this.ignore_face_check.MouseHover += new System.EventHandler(this.ignore_face_check_MouseHover);
             // 
-            // label13
+            // force_compression_check
             // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(162, 200);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(289, 13);
-            this.label13.TabIndex = 59;
-            this.label13.Text = "Ignore diffuse maps, only _s, _n, _g maps will be compresed\r\n";
-            this.label13.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.force_compression_check.AutoSize = true;
+            this.force_compression_check.BackColor = System.Drawing.Color.White;
+            this.force_compression_check.Location = new System.Drawing.Point(25, 154);
+            this.force_compression_check.Name = "force_compression_check";
+            this.force_compression_check.Size = new System.Drawing.Size(115, 17);
+            this.force_compression_check.TabIndex = 59;
+            this.force_compression_check.Text = "Force compression";
+            this.force_compression_check.UseVisualStyleBackColor = false;
+            this.force_compression_check.MouseHover += new System.EventHandler(this.force_compression_check_MouseHover);
             // 
-            // label14
+            // label1
             // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(162, 154);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(232, 13);
-            this.label14.TabIndex = 60;
-            this.label14.Text = "Compressing face textures breaks them in game";
-            this.label14.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(480, 416);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(185, 13);
+            this.label1.TabIndex = 60;
+            this.label1.Text = "Options have tooltips on mouse hover";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(680, 448);
-            this.Controls.Add(this.label14);
-            this.Controls.Add(this.label13);
-            this.Controls.Add(this.ignoreface_check);
-            this.Controls.Add(this.ignorediffuse_check);
+            this.ClientSize = new System.Drawing.Size(680, 477);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.force_compression_check);
+            this.Controls.Add(this.ignore_face_check);
+            this.Controls.Add(this.ignore_diffuse_check);
             this.Controls.Add(this.label12);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.threads_combo);
@@ -532,11 +510,10 @@
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.label6);
-            this.Controls.Add(this.compressnoalpha_combo);
-            this.Controls.Add(this.compresswithalpha_combo);
+            this.Controls.Add(this.compress_lvl_string_combo);
+            this.Controls.Add(this.compress_lvl_alpha_string_combo);
             this.Controls.Add(this.optionsbutton);
-            this.Controls.Add(this.label9);
-            this.Controls.Add(this.ignoresn_check);
+            this.Controls.Add(this.ignore_sng_maps_check);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.aboutbutton);
@@ -544,9 +521,7 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.backupname);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.backup_check);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.resize_check);
             this.Controls.Add(this.texturesize_combo);
             this.Controls.Add(this.compress_check);
@@ -573,9 +548,7 @@
         private System.Windows.Forms.CheckBox compress_check;
         private System.Windows.Forms.ComboBox texturesize_combo;
         private System.Windows.Forms.CheckBox resize_check;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox backup_check;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox backupname;
         private System.Windows.Forms.Label label4;
@@ -583,11 +556,10 @@
         private System.Windows.Forms.Button aboutbutton;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.CheckBox ignoresn_check;
-        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.CheckBox ignore_sng_maps_check;
         private System.Windows.Forms.Button optionsbutton;
-        private System.Windows.Forms.ComboBox compresswithalpha_combo;
-        private System.Windows.Forms.ComboBox compressnoalpha_combo;
+        private System.Windows.Forms.ComboBox compress_lvl_alpha_string_combo;
+        private System.Windows.Forms.ComboBox compress_lvl_string_combo;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.LinkLabel linkLabel1;
@@ -598,10 +570,11 @@
         private System.Windows.Forms.ComboBox threads_combo;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label12;
-        private System.Windows.Forms.CheckBox ignorediffuse_check;
-        private System.Windows.Forms.CheckBox ignoreface_check;
-        private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.CheckBox ignore_diffuse_check;
+        private System.Windows.Forms.CheckBox ignore_face_check;
+        private System.Windows.Forms.CheckBox force_compression_check;
+        private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Label label1;
     }
 }
 
