@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -8,6 +8,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
+using System.Runtime;
 
 namespace Fallout4_Texture_Compressor
 {
@@ -15,7 +16,7 @@ namespace Fallout4_Texture_Compressor
     {
         int compress_lvl, compress_lvl_alpha;
         double original_files_size = 0, compressed_files_size = 0;
-        string compress_lvl_string, compress_lvl_alpha_string, texturesize;
+        string compress_lvl_string, compress_lvl_alpha_string, texturerate, texturesize, maxtexturesize, mintexturesize, mipsgen;
         bool ba2 = false;
         int currentthreads = 0;
         Queue<string> logqueue;
@@ -64,7 +65,11 @@ namespace Fallout4_Texture_Compressor
 
                 compress_lvl_alpha_string = compress_lvl_alpha_string_combo.Text;
                 compress_lvl_string = compress_lvl_string_combo.Text;
+                texturerate = texturerate_combo.Text;
                 texturesize = texturesize_combo.Text;
+                maxtexturesize = maxtexturesize_combo.Text;
+                mintexturesize = mintexturesize_combo.Text;
+                mipsgen = mipsgen_combo.Text;
                 logqueue = new Queue<string>();
 
                 original_files_size = 0;
@@ -122,6 +127,11 @@ namespace Fallout4_Texture_Compressor
                 listBox1.Items.Add("Ignore diffuse: " + ignore_diffuse_check.Checked.ToString());
                 listBox1.Items.Add("Resize textures down: " + resize_check.Checked.ToString());
                 listBox1.Items.Add("Multithreading: " + threading_check.Checked.ToString());
+		listBox1.Items.Add("Reduce texture size, times: " + texturerate);
+		listBox1.Items.Add("Resize textures sized over: " + texturesize);
+		listBox1.Items.Add("Max resized texture size: " + maxtexturesize);
+		listBox1.Items.Add("Min resized texture size: " + mintexturesize);
+		listBox1.Items.Add("Generate mipmaps: " + mipsgen);
                 listBox1.Items.Add("");
 
                 //indexed files
@@ -131,8 +141,11 @@ namespace Fallout4_Texture_Compressor
                     int maxthreads = int.Parse(threads_combo.Text);
                     if (allfiles.Length < maxthreads) maxthreads = allfiles.Length;
                     int files = 0;
+		    int loggerthread = 10;
                     while (files < allfiles.Length || currentthreads > 0)
                     {
+			loggerthread--;
+			if (loggerthread==0) loggerthread=10;
                         if (currentthreads < maxthreads && files < allfiles.Length)//Trying not to go over maximum allowed threads
                         {
                             startcompressthread(allfiles[files], ignore_sng_maps_check.Checked, ignore_face_check.Checked, ignore_diffuse_check.Checked, force_compression_check.Checked, files + 1);
@@ -150,12 +163,14 @@ namespace Fallout4_Texture_Compressor
                         Thread.Sleep(10);
 
                         //Add log entries to listbox while still processing, so users won't panic
-                        if (logqueue.Count > 0)
+                        if ((logqueue.Count > 0)&& (loggerthread==10) )
                         {
                             string[] fixqueue = logqueue.ToArray();
                             logqueue.Clear();
-                            foreach (string entry in fixqueue) listBox1.Items.Add(entry);
+                            foreach (string entry in fixqueue) { if (entry != null ) listBox1.Items.Add(entry); }
                         }
+
+
                         listBox1.TopIndex = listBox1.Items.Count - 1;
                     }
 
@@ -298,12 +313,8 @@ namespace Fallout4_Texture_Compressor
             else
             {
                 //Analyze dds file
-                ddsfileinfo ddsinfo = checkdds(file);
-
-                log.Add("height = " + ddsinfo.height);
-                log.Add("width  = " + ddsinfo.width);
-                log.Add("format = " + ddsinfo.format);
-                log.Add("alpha = " + ddsinfo.alpha.ToString());
+                ddsfileinfo ddsinfo = checkdds(file,0);
+log.Add("format = " + ddsinfo.format + "; alpha = " + ddsinfo.alpha.ToString() + "; height = " + ddsinfo.height + " width  = " + ddsinfo.width);
 
                 if (ddsinfo.format.Contains("Unsupported format"))
                 {
@@ -317,20 +328,23 @@ namespace Fallout4_Texture_Compressor
                     log.Add("file size = " + filesize + " kb");
 
                     //Compression
-                    if (compress_check.Checked)
+/*                    if ((compress_check.Checked)&&(!resize_check.Checked))
                     {
                         string compressed = CompressDDS(ddsinfo, file, fileinf, force_compression);
                         if (!compressed.Contains("Already compressed")) log.Add("new format = " + compressed);
                     }
+*/
                     //Resizing
                     if (resize_check.Checked)
                     {
-                        bool resized = resize(ddsinfo, file, fileinf);
-                        if (resized)
+                        string resized = resize(ddsinfo, file, fileinf);
+/*                        if (resized>1)
                         {
-                            log.Add("new width  = " + (ddsinfo.width / 2));
-                            log.Add("new height = " + (ddsinfo.height / 2));
+                            log.Add("new width  = " + (ddsinfo.width / resized));
+                            log.Add("new height = " + (ddsinfo.height / resized));
                         }
+*/
+log.Add(resized);
                     }
 
                     //Log size of the file
@@ -366,7 +380,7 @@ namespace Fallout4_Texture_Compressor
                 if (ddsinfo.format.Contains("BC1")) ddslvl = 1;
                 else if (ddsinfo.format.Contains("BC2")) ddslvl = 3;
                 else if (ddsinfo.format.Contains("BC3")) ddslvl = 3;
-                else if (ddsinfo.format.Contains("BC4")) ddslvl = 5;
+                else if (ddsinfo.format.Contains("BC4")) ddslvl = 4;
                 else if (ddsinfo.format.Contains("BC5")) ddslvl = 5;
                 else if (ddsinfo.format.Contains("BC7")) ddslvl = 7;
 
@@ -380,15 +394,18 @@ namespace Fallout4_Texture_Compressor
             //Maximum compression is already achieved, congratulations.
             if (ddslvl == 1)
                 return newformat;
-
+	    //Maximum for alpha
+	    if ((ddsinfo.alpha == true) && (ddslvl == 3))
+		return newformat;
             //Parameters for texture with alpha channel
             if (ddsinfo.alpha == true)
             {
                 if (ddslvl > compress_lvl_alpha)
                     if (ddsinfo.format.Contains("SRGB") && compress_lvl_alpha_string == "BC5")//SRGB BC5 is SASSY so we should only compress it to BC3
                     {
-                        texconv("\"" + file + "\" -y -f BC3_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
-                        newformat = "BC3_UNORM_SRGB";
+//                        texconv("\"" + file + "\" -y -f BC3_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
+                        texconv("\"" + file + "\" -y -f BC7_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
+                        newformat = "BC7_UNORM_SRGB";
                     }
                     else
                     {
@@ -402,8 +419,9 @@ namespace Fallout4_Texture_Compressor
                 if (ddslvl > compress_lvl)
                     if (ddsinfo.format.Contains("SRGB") && compress_lvl_string == "BC5")//SRGB BC5 is SASSY so we should only compress it to BC3
                     {
-                        texconv("\"" + file + "\" -y -f BC3_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
-                        newformat = "BC3_UNORM_SRGB";
+//                        texconv("\"" + file + "\" -y -f BC3_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
+                        texconv("\"" + file + "\" -y -f BC7_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"");
+                        newformat = "BC7_UNORM_SRGB";
                     }
                     else
                     {
@@ -416,33 +434,94 @@ namespace Fallout4_Texture_Compressor
 
         //Resizing
         //Compose Arguments for texconv from our parameters and run it
-        private bool resize(ddsfileinfo ddsinfo, string file, FileInfo fileinf)
+        private string resize(ddsfileinfo ddsinfo, string file, FileInfo fileinf)
         {
             int size = 0;
+	    int minsize = 0;
+	    int divisor = 1;
+	    int mips=1;
+	    string BC_prefix = "";
+	    string signnorm="";
+            string srgb_suffix = "";
+	 string convargs = "";
+            if (ddsinfo.format.Contains("SRGB"))
+                srgb_suffix = "_SRGB";
+            if (ddsinfo.format.Contains("BC4")) BC_prefix = "BC4"; else
+            if (ddsinfo.format.Contains("BC3")) BC_prefix = "BC3"; else //"BC7"
+            if (ddsinfo.format.Contains("BC1")) BC_prefix = "BC1"; //"BC7"
+
+            if (ddsinfo.format.Contains("_SNORM")) {
+                signnorm = "_SNORM"; if (ddsinfo.format.Contains("BC5")) BC_prefix = "BC5";
+		} else if (ddsinfo.format.Contains("BC5")) BC_prefix = "BC3";
+
+		 if (ddsinfo.format.Contains("_TYPELESS"))
+		signnorm = "_TYPELESS"; else
+		 if (ddsinfo.format.Contains("_UNORM"))
+		signnorm = "_UNORM";
+
             //Get the biggest size in case if dimensions are unequal
-            if (ddsinfo.height > ddsinfo.width) { size = ddsinfo.height; } else { size = ddsinfo.width; }
+            if (ddsinfo.height > ddsinfo.width) { size = ddsinfo.height; minsize=ddsinfo.width; } else { size = ddsinfo.width; minsize = ddsinfo.height;}
 
             //Convert text parameter to int
             int ifgreater = 8192;
-            if (texturesize.Contains("256")) { ifgreater = 256; }
+	    int maxts = 8192;
+	    int mints = 8192;
+
+            if (texturerate.Contains("2")) { divisor = 2; }
+            else if (texturerate.Contains("4")) { divisor = 4; }
+            else if (texturerate.Contains("8")) { divisor = 8; }
+
+            if (texturesize.Contains("128")) { ifgreater = 128; }
+            else if (texturesize.Contains("256")) { ifgreater = 256; }
             else if (texturesize.Contains("512")) { ifgreater = 512; }
             else if (texturesize.Contains("1024")) { ifgreater = 1024; }
             else if (texturesize.Contains("2048")) { ifgreater = 2048; }
             else if (texturesize.Contains("4096")) { ifgreater = 4096; }
             else if (texturesize.Contains("All")) { ifgreater = 4; }
 
+            if (maxtexturesize.Contains("128")) { maxts = 128; }
+            else if (maxtexturesize.Contains("256")) { maxts = 256; }
+            else if (maxtexturesize.Contains("512")) { maxts = 512; }
+            else if (maxtexturesize.Contains("1024")) { maxts = 1024; }
+            else if (maxtexturesize.Contains("2048")) { maxts = 2048; }
+            else if (maxtexturesize.Contains("4096")) { maxts = 4096; }
 
-            if (size > ifgreater)
-            {
+
+            if (mintexturesize.Contains("32")) { mints = 32; }
+            else if (mintexturesize.Contains("64")) { mints = 64; }
+            else if (mintexturesize.Contains("128")) { mints = 128; }
+            else if (mintexturesize.Contains("256")) { mints = 256; }
+            else if (mintexturesize.Contains("512")) { mints = 512; }
+            else if (mintexturesize.Contains("All")) { mints = 16; }
+
+            if (mipsgen.Contains("1")) { mips = 1; }
+            else if (mipsgen.Contains("2")) { if (ddsinfo.mips>1)  mips = 2; }
+            else if (mipsgen.Contains("half")) { if (ddsinfo.mips>1)  mips = Convert.ToInt32(Math.Floor( (Math.Log(minsize/divisor ) / Math.Log( 2 ))/2)); }
+            else if (mipsgen.Contains("All")) {  if (ddsinfo.mips>1)  mips = Convert.ToInt32(Math.Log( minsize/divisor ) / Math.Log( 2 )); }
+
+            if (size > ifgreater) 
+		{
+		if (size > maxts*4) divisor = size / maxts ; 
+		if (minsize/divisor <= mints) divisor = minsize/mints;
+		if ((minsize <= mints)||((minsize/divisor <= mints)&&(divisor==2))||(divisor<=1)) return "1";
+
                 //Resize
-                texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / 2 + " -h " + ddsinfo.height / 2 + " -m 1");
+//                texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\" -w " + ddsinfo.width / divisor + " -h " + ddsinfo.height / divisor + " -m 1");
                 //Generate mipmaps
-                texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\"" + " -m 0");
+//                texconv("\"" + file + "\" -y -o \"" + fileinf.DirectoryName + "\"" + " -m 0");
+                //Resize
 
-                return true;//Report our success
+//if (ddsinfo.mips>2)  mips = Convert.ToInt32(Math.Log( minsize/divisor ) / Math.Log( 2 ));
+convargs="\"" + file + "\" -y -f " + BC_prefix + signnorm + srgb_suffix  + " -w " + ddsinfo.width / divisor + " -h " + ddsinfo.height / divisor + " -m " + mips.ToString() + " -o \"" + fileinf.DirectoryName + "\"";
+                texconv(convargs);
+                //Generate mipmaps
+//                texconv("\"" + file + "\" -y -f BC7_UNORM_SRGB -o \"" + fileinf.DirectoryName + "\"" + " -m 0");
+
+
+                return convargs;//Report our success
             }
             else
-                return false;//Report that we are already gucci
+                return "1";//Report that we are already gucci
         }
 
         //TexConv Utility Starter
@@ -460,7 +539,7 @@ namespace Fallout4_Texture_Compressor
         }
 
         //Run texdiag tool for gathering info about dds file
-        private ddsfileinfo checkdds(string file)
+        private ddsfileinfo checkdds(string file, int checkalpha)
         {
             //Setup
             Process process = new Process();
@@ -520,6 +599,24 @@ namespace Fallout4_Texture_Compressor
                         }
                 }
 
+                //Parse width of texture
+                if (line.Contains("mipLevels"))
+                {
+                    //Some users reported int.parse errors so we are doing this long ctrl-c + ctrl-v shit now that might not actually work
+                    int temp;
+                    if (int.TryParse(line.Substring(line.IndexOf("=") + 2, line.Length - line.IndexOf("=") - 2), out temp))
+                        ddsinfo.mips = temp;
+                    else
+                        try
+                        {
+                            ddsinfo.mips = int.Parse(line.Substring(line.IndexOf("=") + 2, line.Length - line.IndexOf("=") - 2), CultureInfo.InvariantCulture);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Couldn't parse dds mip levels. Screenshot this message and send it to the author and attach the file that caused this error. File: " + file + " Error log: " + ex.ToString());
+                        }
+                }
+
                 //Get format
                 if (line.Contains("format"))
                 {
@@ -536,6 +633,9 @@ namespace Fallout4_Texture_Compressor
             }
             //process.WaitForExit();
 
+if (checkalpha < 1 ) 
+	ddsinfo.alpha = true; //avoid alpha checks speedup
+	else {
 
             //Now get ready for some crazy stuff
             //With the help of the Elder Gods and curiosity I've found the way to determine if texture actually has alpha channel, because texdiag doesn't show it straight on :(
@@ -632,8 +732,12 @@ namespace Fallout4_Texture_Compressor
                 //Alpha = rekt
                 if (blocks6 > 0 && blocks8 > 0) ddsinfo.alpha = true;
                 //Delete converted file
-                if (File.Exists(Application.StartupPath + "\\temp\\" + fileinf.Name + "\"")) File.Delete(Application.StartupPath + "\\temp\\" + fileinf.Name + "\"");
+//                if (File.Exists("\""+Application.StartupPath + "\\temp\\" + fileinf.Name + "\"")) File.Delete("\"" + Application.StartupPath + "\\temp\\" + fileinf.Name + "\""); else MessageBox.Show("No \"" + Application.StartupPath + "\\temp\\" + fileinf.Name + "\"");
+//                if (File.Exists(Application.StartupPath + "\\temp\\" + fileinf.Name )) File.Delete(Application.StartupPath + "\\temp\\" + fileinf.Name ); else MessageBox.Show("No " + Application.StartupPath + "\\temp\\" + fileinf.Name );
             }
+//                File.Delete("\"" + Application.StartupPath + "\\temp\\" + fileinf.Name + "\"");
+if (File.Exists(Application.StartupPath + "\\temp\\" + fileinf.Name )) File.Delete( Application.StartupPath + "\\temp\\" + fileinf.Name ); //else MessageBox.Show("\"" + Application.StartupPath + "\\temp\\" + fileinf.Name + "\"");
+	}
             return ddsinfo;
         }
 
@@ -960,11 +1064,43 @@ namespace Fallout4_Texture_Compressor
         {
             e.Handled = true;
         }
+        private void texturerate_combo_KeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
+        }
+        private void texturerate_combo_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
         private void texturesize_combo_KeyDown(object sender, KeyEventArgs e)
         {
             e.Handled = true;
         }
         private void texturesize_combo_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+        private void maxtexturesize_combo_KeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
+        }
+        private void maxtexturesize_combo_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+        private void mintexturesize_combo_KeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
+        }
+        private void mintexturesize_combo_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+        private void mipsgen_combo_KeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
+        }
+        private void mipsgen_combo_KeyPress(object sender, KeyPressEventArgs e)
         {
             e.Handled = true;
         }
@@ -1036,6 +1172,7 @@ namespace Fallout4_Texture_Compressor
     {
         public int width { get; set; }
         public int height { get; set; }
+	public int mips { get; set; }
         public string format { get; set; }
         public bool alpha { get; set; }
     }

@@ -1,4 +1,4 @@
-﻿namespace Fallout4_Texture_Compressor
+namespace Fallout4_Texture_Compressor
 {
     partial class MainForm
     {
@@ -35,7 +35,11 @@
             this.browsebutton = new System.Windows.Forms.Button();
             this.pathtextbox = new System.Windows.Forms.TextBox();
             this.compress_check = new System.Windows.Forms.CheckBox();
+            this.texturerate_combo = new System.Windows.Forms.ComboBox();
             this.texturesize_combo = new System.Windows.Forms.ComboBox();
+            this.maxtexturesize_combo = new System.Windows.Forms.ComboBox();
+            this.mintexturesize_combo = new System.Windows.Forms.ComboBox();
+            this.mipsgen_combo = new System.Windows.Forms.ComboBox();
             this.resize_check = new System.Windows.Forms.CheckBox();
             this.backup_check = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
@@ -124,8 +128,8 @@
             // 
             this.compress_check.AutoSize = true;
             this.compress_check.BackColor = System.Drawing.Color.White;
-            this.compress_check.Checked = true;
-            this.compress_check.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.compress_check.Checked = false;
+            this.compress_check.CheckState = System.Windows.Forms.CheckState.Unchecked;
             this.compress_check.Location = new System.Drawing.Point(25, 71);
             this.compress_check.Name = "compress_check";
             this.compress_check.Size = new System.Drawing.Size(116, 17);
@@ -133,28 +137,102 @@
             this.compress_check.Text = "Compress Textures";
             this.compress_check.UseVisualStyleBackColor = false;
             // 
+            // texturerate_combo
+            // 
+            this.texturerate_combo.BackColor = System.Drawing.Color.White;
+            this.texturerate_combo.FormattingEnabled = true;
+            this.texturerate_combo.Items.AddRange(new object[] {
+            "by 2x",
+            "4",
+            "8",
+            "1.33",
+            "3"});
+            this.texturerate_combo.Location = new System.Drawing.Point(25, 269);
+            this.texturerate_combo.Name = "texturerate_combo";
+            this.texturerate_combo.Size = new System.Drawing.Size(70, 21);
+            this.texturerate_combo.TabIndex = 10;
+            this.texturerate_combo.Text = "2";
+            this.texturerate_combo.KeyDown += new System.Windows.Forms.KeyEventHandler(this.texturerate_combo_KeyDown);
+            this.texturerate_combo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.texturerate_combo_KeyPress);
+
+            // 
             // texturesize_combo
             // 
             this.texturesize_combo.BackColor = System.Drawing.Color.White;
             this.texturesize_combo.FormattingEnabled = true;
             this.texturesize_combo.Items.AddRange(new object[] {
             "All",
+            "if > 128",
             "if > 256",
             "if > 512",
             "if > 1024",
             "if > 2048",
             "if > 4096"});
-            this.texturesize_combo.Location = new System.Drawing.Point(25, 269);
+            this.texturesize_combo.Location = new System.Drawing.Point(105, 269);
             this.texturesize_combo.Name = "texturesize_combo";
-            this.texturesize_combo.Size = new System.Drawing.Size(121, 21);
+            this.texturesize_combo.Size = new System.Drawing.Size(70, 21);
             this.texturesize_combo.TabIndex = 10;
             this.texturesize_combo.Text = "if > 1024";
             this.texturesize_combo.KeyDown += new System.Windows.Forms.KeyEventHandler(this.texturesize_combo_KeyDown);
             this.texturesize_combo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.texturesize_combo_KeyPress);
             // 
+            // maxtexturesize_combo
+            // 
+            this.maxtexturesize_combo.BackColor = System.Drawing.Color.White;
+            this.maxtexturesize_combo.FormattingEnabled = true;
+            this.maxtexturesize_combo.Items.AddRange(new object[] {
+            "Max 256",
+            "Max 512",
+            "Max 1024",
+            "Max 2048",
+            "Max 4096"});
+            this.maxtexturesize_combo.Location = new System.Drawing.Point(185, 269);
+            this.maxtexturesize_combo.Name = "maxtexturesize_combo";
+            this.maxtexturesize_combo.Size = new System.Drawing.Size(70, 21);
+            this.maxtexturesize_combo.TabIndex = 1;
+            this.maxtexturesize_combo.Text = "Max 1024";
+            this.maxtexturesize_combo.KeyDown += new System.Windows.Forms.KeyEventHandler(this.maxtexturesize_combo_KeyDown);
+            this.maxtexturesize_combo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.maxtexturesize_combo_KeyPress);
+            // 
+            // mintexturesize_combo
+            // 
+            this.mintexturesize_combo.BackColor = System.Drawing.Color.White;
+            this.mintexturesize_combo.FormattingEnabled = true;
+            this.mintexturesize_combo.Items.AddRange(new object[] {
+            "Min 16",
+            "Min 32",
+            "Min 64",
+            "Min 128"});
+            this.mintexturesize_combo.Location = new System.Drawing.Point(265, 269);
+            this.mintexturesize_combo.Name = "mintexturesize_combo";
+            this.mintexturesize_combo.Size = new System.Drawing.Size(70, 21);
+            this.mintexturesize_combo.TabIndex = 1;
+            this.mintexturesize_combo.Text = "Min 128";
+            this.mintexturesize_combo.KeyDown += new System.Windows.Forms.KeyEventHandler(this.mintexturesize_combo_KeyDown);
+            this.mintexturesize_combo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.mintexturesize_combo_KeyPress);
+            // 
+            // mipsgen_combo
+            // 
+            this.mipsgen_combo.BackColor = System.Drawing.Color.White;
+            this.mipsgen_combo.FormattingEnabled = true;
+            this.mipsgen_combo.Items.AddRange(new object[] {
+            "Miplevels: 1",
+            "Miplevels: 2",
+            "Miplevels: half",
+            "Miplevels: All"});
+            this.mipsgen_combo.Location = new System.Drawing.Point(345, 269);
+            this.mipsgen_combo.Name = "mipsgen_combo";
+            this.mipsgen_combo.Size = new System.Drawing.Size(121, 21);
+            this.mipsgen_combo.TabIndex = 1;
+            this.mipsgen_combo.Text = "Miplevels: 1";
+            this.mipsgen_combo.KeyDown += new System.Windows.Forms.KeyEventHandler(this.mipsgen_combo_KeyDown);
+            this.mipsgen_combo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.mipsgen_combo_KeyPress);
+            // 
             // resize_check
             // 
             this.resize_check.AutoSize = true;
+            this.resize_check.Checked = true;
+            this.resize_check.CheckState = System.Windows.Forms.CheckState.Checked;
             this.resize_check.BackColor = System.Drawing.Color.White;
             this.resize_check.Location = new System.Drawing.Point(25, 246);
             this.resize_check.Name = "resize_check";
@@ -168,8 +246,8 @@
             // 
             this.backup_check.AutoSize = true;
             this.backup_check.BackColor = System.Drawing.Color.White;
-            this.backup_check.Checked = true;
-            this.backup_check.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.backup_check.Checked = false;
+            this.backup_check.CheckState = System.Windows.Forms.CheckState.Unchecked;
             this.backup_check.Location = new System.Drawing.Point(25, 301);
             this.backup_check.Name = "backup_check";
             this.backup_check.Size = new System.Drawing.Size(93, 17);
@@ -536,7 +614,11 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.backup_check);
             this.Controls.Add(this.resize_check);
+            this.Controls.Add(this.texturerate_combo);
             this.Controls.Add(this.texturesize_combo);
+            this.Controls.Add(this.maxtexturesize_combo);
+            this.Controls.Add(this.mintexturesize_combo);
+            this.Controls.Add(this.mipsgen_combo);
             this.Controls.Add(this.compress_check);
             this.Controls.Add(this.pathtextbox);
             this.Controls.Add(this.browsebutton);
@@ -559,7 +641,11 @@
         private System.Windows.Forms.Button browsebutton;
         private System.Windows.Forms.TextBox pathtextbox;
         private System.Windows.Forms.CheckBox compress_check;
+        private System.Windows.Forms.ComboBox texturerate_combo;
         private System.Windows.Forms.ComboBox texturesize_combo;
+        private System.Windows.Forms.ComboBox maxtexturesize_combo;
+        private System.Windows.Forms.ComboBox mintexturesize_combo;
+        private System.Windows.Forms.ComboBox mipsgen_combo;
         private System.Windows.Forms.CheckBox resize_check;
         private System.Windows.Forms.CheckBox backup_check;
         private System.Windows.Forms.Label label3;

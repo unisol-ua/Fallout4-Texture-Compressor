@@ -60,7 +60,7 @@ namespace Fallout4_Texture_Compressor
                 if ((long)this.uiMaxArchiveSize == (long)value)
                     return;
                 this.uiMaxArchiveSize = value;
-                this.NotifyPropertyChanged(nameof(MaxArchiveSize));
+                this.NotifyPropertyChanged("MaxArchiveSize");
                 this.NotifyPropertyChanged("MaxArchiveSizeMB");
             }
         }
@@ -78,7 +78,7 @@ namespace Fallout4_Texture_Compressor
                     return;
                 this.uiMaxArchiveSize = num;
                 this.NotifyPropertyChanged("MaxArchiveSize");
-                this.NotifyPropertyChanged(nameof(MaxArchiveSizeMB));
+                this.NotifyPropertyChanged("MaxArchiveSizeMB");
             }
         }
 
@@ -93,7 +93,7 @@ namespace Fallout4_Texture_Compressor
                 if ((int)this.uiArchiveCount == (int)value)
                     return;
                 this.uiArchiveCount = value;
-                this.NotifyPropertyChanged(nameof(ArchiveCount));
+                this.NotifyPropertyChanged("ArchiveCount");
             }
         }
 
@@ -108,7 +108,7 @@ namespace Fallout4_Texture_Compressor
                 if ((int)this.uiMaxChunkCount == (int)value)
                     return;
                 this.uiMaxChunkCount = value;
-                this.NotifyPropertyChanged(nameof(MaxChunkCount));
+                this.NotifyPropertyChanged("MaxChunkCount");
             }
         }
 
@@ -123,7 +123,7 @@ namespace Fallout4_Texture_Compressor
                 if ((int)this.uiSingleMipChunkAreaX == (int)value)
                     return;
                 this.uiSingleMipChunkAreaX = value;
-                this.NotifyPropertyChanged(nameof(SingleMipChunkAreaX));
+                this.NotifyPropertyChanged("SingleMipChunkAreaX");
                 this.NotifyPropertyChanged("SingleMipChunkArea");
             }
         }
@@ -139,7 +139,7 @@ namespace Fallout4_Texture_Compressor
                 if ((int)this.uiSingleMipChunkAreaY == (int)value)
                     return;
                 this.uiSingleMipChunkAreaY = value;
-                this.NotifyPropertyChanged(nameof(SingleMipChunkAreaY));
+                this.NotifyPropertyChanged("SingleMipChunkAreaY");
                 this.NotifyPropertyChanged("SingleMipChunkArea");
             }
         }
@@ -163,7 +163,7 @@ namespace Fallout4_Texture_Compressor
                 if (this.archiveFormat == value)
                     return;
                 this.archiveFormat = value;
-                this.NotifyPropertyChanged(nameof(ArchiveFormat));
+                this.NotifyPropertyChanged("ArchiveFormat");
                 if (this.archiveFormat != FileFormat.XBoxDDS)
                     return;
                 this.FileCompressionType = CompressionType.XBox;
@@ -181,7 +181,7 @@ namespace Fallout4_Texture_Compressor
                 if (this.chunkStorageType == value)
                     return;
                 this.chunkStorageType = value;
-                this.NotifyPropertyChanged(nameof(ChunkStorageType));
+                this.NotifyPropertyChanged("ChunkStorageType");
             }
         }
 
@@ -196,7 +196,7 @@ namespace Fallout4_Texture_Compressor
                 if (this.fileCompressionType == value || this.ArchiveFormat == FileFormat.XBoxDDS && value != CompressionType.XBox)
                     return;
                 this.fileCompressionType = value;
-                this.NotifyPropertyChanged(nameof(FileCompressionType));
+                this.NotifyPropertyChanged("FileCompressionType");
             }
         }
 
